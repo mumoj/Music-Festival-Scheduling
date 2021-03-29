@@ -118,8 +118,16 @@ class IndependentPerformerProfile(models.Model):
         ("MPESA", 'Mpesa')
     )
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    performance_class = models.ForeignKey(Class, on_delete=models.CASCADE)
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
+    performance_class = models.ForeignKey(
+        Class,
+        null=True,
+        on_delete=models.CASCADE
+    )
+    institution = models.ForeignKey(
+        Institution,
+        null=True,
+        on_delete=models.CASCADE
+    )
     payment_method = models.CharField(
         max_length=10,
         choices=PAYMENT_METHODS,
