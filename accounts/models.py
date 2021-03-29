@@ -87,10 +87,19 @@ class DependentPerformerProfile(models.Model):
     Defines underage performers who rely on sponsors.
     """
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
-    performance_class = models.ForeignKey(Class, on_delete=models.CASCADE)
+    institution = models.ForeignKey(
+        Institution,
+        null=True,
+        on_delete=models.CASCADE
+    )
+    performance_class = models.ForeignKey(
+        Class,
+        null=True,
+        on_delete=models.CASCADE
+    )
     sponsor = models.ForeignKey(
         SponsorProfile,
+        null=True,
         on_delete=models.CASCADE,
         related_name="sponsor"
     )

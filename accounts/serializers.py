@@ -86,7 +86,7 @@ class DependentPerformerProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DependentPerformerProfile
-        fields = ('sponsor',)
+        fields = ('institution', 'performance_class', 'sponsor',)
 
 
 class IndependentPerformerProfileSerializer(serializers.ModelSerializer):

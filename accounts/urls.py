@@ -12,8 +12,8 @@ urlpatterns = [
          RegisterSponsorProfile.as_view(),
          name='register-sponsor'),
 
-    path('register/dependent_performer/<int:performer_profile_pk>/',
+    path('register/dependent_performer/<int:dependent_performer_profile_pk>/',
          RegisterDependentPerformerProfile.as_view(),
-         name='register-sponsor')
+         name='register-dependent-performer')
 
 ]

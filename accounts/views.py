@@ -56,7 +56,7 @@ class CustomRegisterView(RegisterView):
             dependent_performer_profile.save()
             return redirect(reverse(
                 'accounts:register-dependent-performer',
-                kwargs={'performer_profile_pk': dependent_performer_profile.pk}
+                kwargs={'dependent_performer_profile_pk': dependent_performer_profile.pk}
             ))
 
         elif request.data['role'] == 'HEAD_OF_INSTITUTION':
@@ -88,7 +88,7 @@ class RegisterDependentPerformerProfile(RetrieveUpdateAPIView):
     queryset = DependentPerformerProfile.objects.all()
     serializer_class = DependentPerformerProfileSerializer
     lookup_field = 'id'
-    lookup_url_kwarg = 'sponsor_profile_pk'
+    lookup_url_kwarg = 'dependent_performer_profile_pk'
 
 
 
