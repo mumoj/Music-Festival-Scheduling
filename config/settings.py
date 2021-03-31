@@ -140,6 +140,11 @@ STATIC_URL = '/static/'
 # Custom User
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
+AUTHENTICATION_BACKENDS = [
+    'allauth.account.auth_backends.AuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # Django-allauth settings.
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
@@ -151,13 +156,21 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = 'settings.LOGIN_URL'
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = None
 SITE_ID = 1
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ACCOUNT_ADAPTER = 'accounts.adapters.UserAdapter'
 
-# Django-rest-auth settings
+# Django-rest-auth settings.
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomUserSerializer',
 }
+
+# Email Backend Configuration.
+EMAIL_USE_SSL = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'frodiavolo@gmail.com'
+EMAIL_HOST_PASSWORD = '@Diav666&$$'
+ACCOUNT_ACTIVATION_DAYS = 1
+EMAIL_PORT = 465
 
 
