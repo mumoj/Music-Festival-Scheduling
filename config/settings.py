@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'it2a6!x79=j-pp$9-%l#&33h_=y*$v@tbmve07#^&2glnj6y0h'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -51,6 +49,11 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
 
     'rest_auth.registration',
+
+    'django_inlinecss',
+
+    'naomi',
+
 ]
 
 MIDDLEWARE = [
@@ -68,7 +71,9 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            'accounts/templates/'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -83,7 +88,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -97,7 +101,6 @@ DATABASES = {
         'PORT': '',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -117,7 +120,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -131,14 +133,21 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
+STATICFILES_DIRS = [
+    BASE_DIR / 'accounts' / 'static'
+]
 
 # Custom User
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# Login and Logout urls
+LOGIN_URL = 'accounts:login'
+LOGOUT_URL = 'accounts:logout'
 
 AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
@@ -151,10 +160,13 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
+ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 86400
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = 'settings.LOGIN_URL'
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = LOGIN_URL
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = None
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
 SITE_ID = 1
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
@@ -163,6 +175,10 @@ ACCOUNT_ADAPTER = 'accounts.adapters.UserAdapter'
 # Django-rest-auth settings.
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomUserSerializer',
+}
+REST_AUTH_SERIALIZERS = {
+    'PASSWORD_RESET_SERIALIZER':
+        'accounts.serializers.CustomPasswordResetSerializer',
 }
 
 # Email Backend Configuration.
@@ -173,4 +189,5 @@ EMAIL_HOST_PASSWORD = '@Diav666&$$'
 ACCOUNT_ACTIVATION_DAYS = 1
 EMAIL_PORT = 465
 
-
+# EMAIL_BACKEND = "naomi.mail.backends.naomi.NaomiBackend"
+# EMAIL_FILE_PATH = "/home/jack/PycharmProjects/email_test/tmp"

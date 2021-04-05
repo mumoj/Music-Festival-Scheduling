@@ -1,13 +1,21 @@
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 from allauth.utils import email_address_exists
+
 from rest_framework import serializers
+
+from rest_auth.serializers import PasswordResetSerializer
+
 from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import ugettext_lazy as _
 
-from .models import (TeacherProfile, SponsorProfile,
-                     AdjudicatorProfile, DependentPerformerProfile,
-                     IndependentPerformerProfile, CustomUser)
+from .models import (
+    TeacherProfile,
+    SponsorProfile,
+    AdjudicatorProfile,
+    DependentPerformerProfile,
+    IndependentPerformerProfile,
+    CustomUser)
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -83,14 +91,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class DependentPerformerProfileSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = DependentPerformerProfile
         fields = ('institution', 'performance_class', 'sponsor',)
 
 
 class IndependentPerformerProfileSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = IndependentPerformerProfile
         fields = ()
@@ -105,7 +111,6 @@ class TeacherProfileSerializer(serializers.ModelSerializer):
 
 
 class SponsorProfileSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = SponsorProfile
         fields = ('payment_method',)
@@ -119,4 +124,10 @@ class AdjudicatorProfileSerializer(serializers.ModelSerializer):
         fields = ('user', 'national_id',)
 
 
-
+class CustomPasswordResetSerializer(PasswordResetSerializer):
+    def get_email_options(self):
+        return {
+            'subject_template_name': 'email/password_reset_key_subject.txt',
+            'email_template_name': 'email/password_reset_key_message.txt',
+            'html_email_template_name': 'email/password_reset_email.html',
+        }
