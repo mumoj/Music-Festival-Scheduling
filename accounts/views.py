@@ -1,32 +1,24 @@
-from django.http import JsonResponse, HttpResponse
-from django.shortcuts import reverse, redirect, render
-from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import reverse, redirect
 
-from allauth.account.utils import complete_signup
-from allauth.account import app_settings as allauth_settings
-
-from rest_framework import permissions
-from rest_framework.decorators import api_view
-from rest_framework.generics import (CreateAPIView,
-                                     RetrieveUpdateAPIView)
-from rest_framework.parsers import JSONParser
+from rest_framework.generics import (
+    CreateAPIView,
+    RetrieveUpdateAPIView)
 from rest_framework.response import Response
 from rest_framework import status
 
-from rest_auth.app_settings import create_token
 from rest_auth.registration.views import RegisterView
-from rest_auth.utils import jwt_encode
 
-from config import settings
-from .models import (CustomUser, TeacherProfile,
-                     SponsorProfile, AdjudicatorProfile,
-                     DependentPerformerProfile,
-                     IndependentPerformerProfile)
+from .models import (
+    CustomUser, TeacherProfile,
+    SponsorProfile, AdjudicatorProfile,
+    DependentPerformerProfile,
+    IndependentPerformerProfile)
 
-from .serializers import (TeacherProfileSerializer,
-                          SponsorProfileSerializer,
-                          AdjudicatorProfileSerializer,
-                          DependentPerformerProfileSerializer)
+from .serializers import (
+    TeacherProfileSerializer,
+    SponsorProfileSerializer,
+    AdjudicatorProfileSerializer,
+    DependentPerformerProfileSerializer)
 
 from .group_permissions import HEADS_OF_INSTITUTION_GROUP
 
