@@ -23,10 +23,10 @@ class Institution(models.Model):
         choices=CHOICES,
         max_length=50
     )
-    zone = models.CharField
-    sub_county = models.CharField
-    county = models.CharField
-    region = models.CharField
+    zone = models.CharField(max_length=50)
+    sub_county = models.CharField(max_length=50)
+    county = models.CharField(max_length=50)
+    region = models.CharField(max_length=50)
 
 
 class Class(models.Model):

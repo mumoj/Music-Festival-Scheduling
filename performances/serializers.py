@@ -10,7 +10,7 @@ class InstitutionSerializer(serializers.ModelSerializer):
             'name',
             'institution_type',
             'zone',
-            'sub-county',
+            'sub_county',
             'county',
             'region'
         )
