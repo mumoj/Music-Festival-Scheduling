@@ -25,45 +25,44 @@ from .group_permissions import HEADS_OF_INSTITUTION_GROUP
 
 class CustomRegisterView(RegisterView):
     """
-    Customized Register view for handling all the various user roles in the system
+    Customized Register view for handling
+    registration of users with various roles in the system
     """
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user_email = self.perform_create(serializer)
-        user = CustomUser.objects.get(email=user_email)
-        print(user)
+        user = self.perform_create(serializer)
 
         if request.data['role'] == 'SPONSOR':
             sponsor_profile = SponsorProfile.objects.create(user=user)
             sponsor_profile.save()
             return redirect(reverse(
                 'accounts:register-sponsor',
-                kwargs={'sponsor_profile_pk': sponsor_profile.pk}
-            ))
+                kwargs={'sponsor_profile_pk': sponsor_profile.pk})
+            )
 
         elif request.data['role'] == 'DEPENDENT_PERFORMER':
-            dependent_performer_profile = DependentPerformerProfile.\
+            dependent_performer_profile = DependentPerformerProfile. \
                 objects.create(user=user)
             dependent_performer_profile.save()
             return redirect(reverse(
                 'accounts:register-dependent-performer',
-                kwargs={'dependent_performer_profile_pk': dependent_performer_profile.pk}
-            ))
+                kwargs={'dependent_performer_profile_pk':
+                            dependent_performer_profile.pk})
+            )
 
         elif request.data['role'] == 'HEAD_OF_INSTITUTION':
             user.groups.add(HEADS_OF_INSTITUTION_GROUP)
-            headers = self.get_success_headers(serializer.data)
-            return Response(
-                self.get_response_data(user_email),
-                status=status.HTTP_201_CREATED,
-                headers=headers
+            return redirect(reverse(
+                'performances:register-institutions',
+                kwargs={'head_of_institution': user})
             )
 
         else:
             headers = self.get_success_headers(serializer.data)
             return Response(
-                self.get_response_data(user_email),
+                self.get_response_data(user),
                 status=status.HTTP_201_CREATED,
                 headers=headers
             )
@@ -81,7 +80,3 @@ class RegisterDependentPerformerProfile(RetrieveUpdateAPIView):
     serializer_class = DependentPerformerProfileSerializer
     lookup_field = 'id'
     lookup_url_kwarg = 'dependent_performer_profile_pk'
-
-
-
-
