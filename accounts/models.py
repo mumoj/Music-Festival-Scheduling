@@ -37,7 +37,7 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    def get_full_name(self):
+    def __str__(self):
         """
         Returns the first_name plus the last_name, with a space in between.
         """
