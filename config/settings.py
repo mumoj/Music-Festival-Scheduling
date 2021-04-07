@@ -182,12 +182,12 @@ REST_AUTH_SERIALIZERS = {
 }
 
 # Email Backend Configuration.
-EMAIL_USE_SSL = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'frodiavolo@gmail.com'
-EMAIL_HOST_PASSWORD = '@Diav666&$$'
-ACCOUNT_ACTIVATION_DAYS = 1
-EMAIL_PORT = 465
+# EMAIL_USE_SSL = True
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_HOST_USER = 'frodiavolo@gmail.com'
+# EMAIL_HOST_PASSWORD = '@Diav666&$$'
+# ACCOUNT_ACTIVATION_DAYS = 1
+# EMAIL_PORT = 465
 
-# EMAIL_BACKEND = "naomi.mail.backends.naomi.NaomiBackend"
-# EMAIL_FILE_PATH = "/home/jack/PycharmProjects/email_test/tmp"
+EMAIL_BACKEND = "naomi.mail.backends.naomi.NaomiBackend"
+EMAIL_FILE_PATH = "/home/jack/PycharmProjects/email_test/tmp"
