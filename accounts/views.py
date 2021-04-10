@@ -8,6 +8,8 @@ from rest_framework import status
 
 from rest_auth.registration.views import RegisterView
 
+from performances.models import Institution
+
 from .models import (
     CustomUser, TeacherProfile,
     SponsorProfile, AdjudicatorProfile,
@@ -54,9 +56,12 @@ class CustomRegisterView(RegisterView):
 
         elif request.data['role'] == 'HEAD_OF_INSTITUTION':
             user.groups.add(HEADS_OF_INSTITUTION_GROUP)
-            return redirect(reverse(
-                'performances:register-institutions',
-                kwargs={'head_of_institution': user})
+            Institution.objects.create(head_of_institution=user)
+            headers = self.get_success_headers(serializer.data)
+            return Response(
+                self.get_response_data(user),
+                status=status.HTTP_201_CREATED,
+                headers=headers
             )
 
         else:
