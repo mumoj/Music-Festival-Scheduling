@@ -4,6 +4,7 @@ from .views import (RegisterInstitutions)
 
 app_name = 'performances'
 urlpatterns = [
-    path('register/', RegisterInstitutions.as_view(),
-         name='register-institutions'),
+    path('register-institution/<int:institution_pk>',
+         RegisterInstitutions.as_view(),
+         name='register-institution'),
 ]
