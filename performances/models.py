@@ -18,7 +18,6 @@ class Institution(models.Model):
     head_of_institution = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        primary_key=True,
     )
     institution_type = models.CharField(
         choices=CHOICES,
