@@ -14,19 +14,20 @@ class Institution(models.Model):
         ('OTHERS', 'Others')
 
     )
-    name = models.CharField(max_length=100, null=False)
+    name = models.CharField(max_length=100, blank=False)
     head_of_institution = models.OneToOneField(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        primary_key=True,
     )
     institution_type = models.CharField(
         choices=CHOICES,
         max_length=50
     )
-    zone = models.CharField(max_length=50)
-    sub_county = models.CharField(max_length=50)
-    county = models.CharField(max_length=50)
-    region = models.CharField(max_length=50)
+    zone = models.CharField(max_length=50, blank=False)
+    sub_county = models.CharField(max_length=50, blank=False)
+    county = models.CharField(max_length=50, blank=False)
+    region = models.CharField(max_length=50, blank=False)
 
 
 class Class(models.Model):
