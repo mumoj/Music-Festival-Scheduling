@@ -4,7 +4,7 @@ from rest_auth.registration.views import VerifyEmailView, ConfirmEmailView
 from rest_auth.views import PasswordResetView, PasswordResetConfirmView
 from rest_auth.views import LoginView, LogoutView
 from .views import (
-    CustomRegisterView,
+    CustomRegistrationView,
     RegisterSponsorProfile,
     RegisterDependentPerformerProfile)
 
@@ -13,7 +13,7 @@ urlpatterns = [
     path('accounts-confirm-email/<str:key>/',
          ConfirmEmailView.as_view()),
 
-    path('register/', CustomRegisterView.as_view(),
+    path('register/', CustomRegistrationView.as_view(),
          name='register'),
     path('register/sponsor/<int:sponsor_profile_pk>/',
          RegisterSponsorProfile.as_view(),

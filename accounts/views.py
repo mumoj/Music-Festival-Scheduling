@@ -2,7 +2,13 @@ from django.shortcuts import reverse, redirect
 
 from rest_framework.generics import (
     CreateAPIView,
-    RetrieveUpdateAPIView)
+    RetrieveUpdateAPIView
+)
+from rest_framework.permissions import(
+    IsAuthenticated,
+    BasePermission,
+    SAFE_METHODS
+)
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -14,20 +20,22 @@ from .models import (
     CustomUser, TeacherProfile,
     SponsorProfile, AdjudicatorProfile,
     DependentPerformerProfile,
-    IndependentPerformerProfile)
+    IndependentPerformerProfile
+)
 
 from .serializers import (
     TeacherProfileSerializer,
     SponsorProfileSerializer,
     AdjudicatorProfileSerializer,
-    DependentPerformerProfileSerializer)
+    DependentPerformerProfileSerializer
+)
 
 from .group_permissions import HEADS_OF_INSTITUTION_GROUP
 
 
-class CustomRegisterView(RegisterView):
+class CustomRegistrationView(RegisterView):
     """
-    Customized Register view for handling
+    Customized Registration view for handling
     registration of users with various roles in the system
     """
 
@@ -35,29 +43,33 @@ class CustomRegisterView(RegisterView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
 
         if request.data['role'] == 'SPONSOR':
             sponsor_profile = SponsorProfile.objects.create(user=user)
             sponsor_profile.save()
-            return redirect(reverse(
-                'accounts:register-sponsor',
-                kwargs={'sponsor_profile_pk': sponsor_profile.pk})
+
+            return Response(
+                self.get_response_data(user),
+                status=status.HTTP_201_CREATED,
+                headers=headers
             )
 
         elif request.data['role'] == 'DEPENDENT_PERFORMER':
             dependent_performer_profile = DependentPerformerProfile. \
                 objects.create(user=user)
             dependent_performer_profile.save()
-            return redirect(reverse(
-                'accounts:register-dependent-performer',
-                kwargs={'dependent_performer_profile_pk':
-                            dependent_performer_profile.pk})
+
+            return Response(
+                self.get_response_data(user),
+                status=status.HTTP_201_CREATED,
+                headers=headers
             )
 
         elif request.data['role'] == 'HEAD_OF_INSTITUTION':
             user.groups.add(HEADS_OF_INSTITUTION_GROUP)
             Institution.objects.create(head_of_institution=user)
-            headers = self.get_success_headers(serializer.data)
+
             return Response(
                 self.get_response_data(user),
                 status=status.HTTP_201_CREATED,
@@ -65,17 +77,23 @@ class CustomRegisterView(RegisterView):
             )
 
         else:
-            headers = self.get_success_headers(serializer.data)
-            return Response(
-                self.get_response_data(user),
-                status=status.HTTP_201_CREATED,
-                headers=headers
-            )
+            pass
+
+
+class IsOwnerOrReadOnly(BasePermission):
+    """Custom permission"""
+    message = 'Updating of account details restricted to account owner'
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in SAFE_METHODS:
+            return True
+        return obj.user == request.user
 
 
 class RegisterSponsorProfile(RetrieveUpdateAPIView):
     queryset = SponsorProfile.objects.all()
     serializer_class = SponsorProfileSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     lookup_field = 'id'
     lookup_url_kwarg = 'sponsor_profile_pk'
 
@@ -83,5 +101,6 @@ class RegisterSponsorProfile(RetrieveUpdateAPIView):
 class RegisterDependentPerformerProfile(RetrieveUpdateAPIView):
     queryset = DependentPerformerProfile.objects.all()
     serializer_class = DependentPerformerProfileSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     lookup_field = 'id'
     lookup_url_kwarg = 'dependent_performer_profile_pk'
