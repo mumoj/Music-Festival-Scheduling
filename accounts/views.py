@@ -90,7 +90,11 @@ class IsOwnerOrReadOnly(BasePermission):
         return obj.user == request.user
 
 
-class RegisterSponsorProfile(RetrieveUpdateAPIView):
+class AddSponsorProfile(RetrieveUpdateAPIView):
+    """
+    Once registered, a sponsor has to update their profile details
+    as they are germane to their role in the system.
+    """
     queryset = SponsorProfile.objects.all()
     serializer_class = SponsorProfileSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
@@ -98,7 +102,11 @@ class RegisterSponsorProfile(RetrieveUpdateAPIView):
     lookup_url_kwarg = 'sponsor_profile_pk'
 
 
-class RegisterDependentPerformerProfile(RetrieveUpdateAPIView):
+class AddDependentPerformerProfile(RetrieveUpdateAPIView):
+    """
+    Once registered, a dependent performer has to update their profile details
+    as they are germane to their role in the system.
+    """
     queryset = DependentPerformerProfile.objects.all()
     serializer_class = DependentPerformerProfileSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
