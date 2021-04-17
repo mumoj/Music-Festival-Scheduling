@@ -5,8 +5,8 @@ from rest_auth.views import PasswordResetView, PasswordResetConfirmView
 from rest_auth.views import LoginView, LogoutView
 from .views import (
     CustomRegistrationView,
-    RegisterSponsorProfile,
-    RegisterDependentPerformerProfile)
+    AddSponsorProfile,
+    AddDependentPerformerProfile)
 
 app_name = 'accounts'
 urlpatterns = [
@@ -16,10 +16,10 @@ urlpatterns = [
     path('register/', CustomRegistrationView.as_view(),
          name='register'),
     path('register/sponsor/<int:sponsor_profile_pk>/',
-         RegisterSponsorProfile.as_view(),
+         AddSponsorProfile.as_view(),
          name='register-sponsor'),
     path('register/dependent_performer/<int:dependent_performer_profile_pk>/',
-         RegisterDependentPerformerProfile.as_view(),
+         AddDependentPerformerProfile.as_view(),
          name='register-dependent-performer'),
 
     path('login/', LoginView.as_view(), name='login'),
