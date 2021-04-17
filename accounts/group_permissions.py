@@ -12,7 +12,6 @@ def set_heads_institution_group():
     institution_ct = ContentType.objects.get_for_model(Institution)
     institution_permissions = Permission.objects.filter(
         content_type=institution_ct)
-    perms = [p.id for p in institution_permissions]
     heads_of_institution_group.permissions.set(
         [p.id for p in institution_permissions]
     )
