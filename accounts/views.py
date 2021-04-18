@@ -30,7 +30,7 @@ from .serializers import (
     DependentPerformerProfileSerializer
 )
 
-from .group_permissions import HEADS_OF_INSTITUTION_GROUP
+from .permission_groups import HEADS_OF_INSTITUTION_GROUP
 
 
 class CustomRegistrationView(RegisterView):
@@ -45,36 +45,29 @@ class CustomRegistrationView(RegisterView):
         user = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
 
+        # Return the response once a user profile is created.
+        response = Response(
+            self.get_response_data(user),
+            status=status.HTTP_201_CREATED,
+            headers=headers
+            )
+
         if request.data['role'] == 'SPONSOR':
+            print(user.pk)
             sponsor_profile = SponsorProfile.objects.create(user=user)
             sponsor_profile.save()
-
-            return Response(
-                self.get_response_data(user),
-                status=status.HTTP_201_CREATED,
-                headers=headers
-            )
+            return response
 
         elif request.data['role'] == 'DEPENDENT_PERFORMER':
             dependent_performer_profile = DependentPerformerProfile. \
                 objects.create(user=user)
             dependent_performer_profile.save()
-
-            return Response(
-                self.get_response_data(user),
-                status=status.HTTP_201_CREATED,
-                headers=headers
-            )
+            return response
 
         elif request.data['role'] == 'HEAD_OF_INSTITUTION':
             user.groups.add(HEADS_OF_INSTITUTION_GROUP)
             Institution.objects.create(head_of_institution=user)
-
-            return Response(
-                self.get_response_data(user),
-                status=status.HTTP_201_CREATED,
-                headers=headers
-            )
+            return response
 
         else:
             pass
@@ -98,8 +91,8 @@ class AddSponsorProfile(RetrieveUpdateAPIView):
     queryset = SponsorProfile.objects.all()
     serializer_class = SponsorProfileSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-    lookup_field = 'id'
-    lookup_url_kwarg = 'sponsor_profile_pk'
+    lookup_field = 'user'
+    lookup_url_kwarg = 'sponsor'
 
 
 class AddDependentPerformerProfile(RetrieveUpdateAPIView):
@@ -110,5 +103,5 @@ class AddDependentPerformerProfile(RetrieveUpdateAPIView):
     queryset = DependentPerformerProfile.objects.all()
     serializer_class = DependentPerformerProfileSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-    lookup_field = 'id'
-    lookup_url_kwarg = 'dependent_performer_profile_pk'
+    lookup_field = 'user'
+    lookup_url_kwarg = 'dependent_performer'
