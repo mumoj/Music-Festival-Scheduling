@@ -37,7 +37,7 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    def __str__(self):
+    def get_long_name(self):
         """
         Returns the first_name plus the last_name, with a space in between.
         """
@@ -54,11 +54,8 @@ class CustomUser(AbstractUser):
         """
         return self.first_name
 
-    def email_user(self, subject, message, from_email=None, **kwargs):
-        """
-        Sends an email to this User.
-        """
-        send_mail(subject, message, from_email, [self.email], **kwargs)
+    def __str__(self):
+        return self.email
 
 
 class SponsorProfile(models.Model):
