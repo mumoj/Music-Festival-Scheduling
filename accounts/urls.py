@@ -15,12 +15,12 @@ urlpatterns = [
 
     path('register/', CustomRegistrationView.as_view(),
          name='register'),
-    path('register/sponsor/<int:sponsor_profile_pk>/',
+    path('sponsor/<int:sponsor>/details/',
          AddSponsorProfile.as_view(),
-         name='register-sponsor'),
-    path('register/dependent_performer/<int:dependent_performer_profile_pk>/',
+         name='update-sponsor'),
+    path('dependent_performer/<int:dependent_performer>/details/',
          AddDependentPerformerProfile.as_view(),
-         name='register-dependent-performer'),
+         name='update-dependent_performer'),
 
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
