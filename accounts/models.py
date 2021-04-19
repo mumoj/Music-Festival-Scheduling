@@ -30,6 +30,7 @@ class CustomUser(AbstractUser):
     middle_name = models.CharField(_('middle name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30)
     is_active = models.BooleanField(_('active'), default=True)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
     role = models.CharField(max_length=50, choices=ROLES, default='TEACHER')
 
     objects = CustomUserManager()
@@ -83,7 +84,6 @@ class DependentPerformerProfile(models.Model):
     """
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     performance = models.ManyToManyField(Performance)
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'dependent performer'
@@ -100,10 +100,6 @@ class IndependentPerformerProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     performance_class = models.ForeignKey(
         Class,
-        null=True,
-        on_delete=models.CASCADE)
-    institution = models.ForeignKey(
-        Institution,
         null=True,
         on_delete=models.CASCADE)
     payment_method = models.CharField(
