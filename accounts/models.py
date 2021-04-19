@@ -4,7 +4,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 
-from performances.models import Class, Institution
+from performances.models import Class, Institution, Performance
 
 from .managers import CustomUserManager
 
@@ -44,8 +44,7 @@ class CustomUser(AbstractUser):
         full_name = '%s %s %s' % (
             self.first_name,
             self.middle_name,
-            self.last_name
-        )
+            self.last_name)
         return full_name.strip()
 
     def get_short_name(self):
@@ -64,15 +63,13 @@ class SponsorProfile(models.Model):
     """
     PAYMENT_METHODS = (
         ("PAYPAL", 'Paypal'),
-        ("MPESA", 'Mpesa')
-    )
+        ("MPESA", 'Mpesa'))
 
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     payment_method = models.CharField(
         max_length=10,
         choices=PAYMENT_METHODS,
-        default="MPESA"
-    )
+        default="MPESA")
 
     class Meta:
         verbose_name = 'sponsor'
@@ -81,29 +78,16 @@ class SponsorProfile(models.Model):
 
 class DependentPerformerProfile(models.Model):
     """
-    Defines underage performers who rely on sponsors.
+    Defines school going performers who have to rely on  teachers
+    to register them, train them and generally be responsible for their performance groups.
     """
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    institution = models.ForeignKey(
-        Institution,
-        null=True,
-        on_delete=models.CASCADE
-    )
-    performance_class = models.ForeignKey(
-        Class,
-        null=True,
-        on_delete=models.CASCADE
-    )
-    sponsor = models.ForeignKey(
-        SponsorProfile,
-        null=True,
-        on_delete=models.CASCADE,
-        related_name="sponsor"
-    )
+    performance = models.ManyToManyField(Performance)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = 'dependent_performer'
-        verbose_name_plural = 'dependent_performers'
+        verbose_name = 'dependent performer'
+        verbose_name_plural = 'dependent performers'
 
 
 class IndependentPerformerProfile(models.Model):
@@ -112,28 +96,24 @@ class IndependentPerformerProfile(models.Model):
     """
     PAYMENT_METHODS = (
         ("PAYPAL", 'Paypal'),
-        ("MPESA", 'Mpesa')
-    )
+        ("MPESA", 'Mpesa'))
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     performance_class = models.ForeignKey(
         Class,
         null=True,
-        on_delete=models.CASCADE
-    )
+        on_delete=models.CASCADE)
     institution = models.ForeignKey(
         Institution,
         null=True,
-        on_delete=models.CASCADE
-    )
+        on_delete=models.CASCADE)
     payment_method = models.CharField(
         max_length=10,
         choices=PAYMENT_METHODS,
-        default="MPESA"
-    )
+        default="MPESA")
 
     class Meta:
-        verbose_name = 'independent_performer'
-        verbose_name_plural = 'independent_performers'
+        verbose_name = 'independent performer'
+        verbose_name_plural = 'independent performers'
 
 
 class TeacherProfile(models.Model):
@@ -141,10 +121,9 @@ class TeacherProfile(models.Model):
     Teacher responsible for a dependent performer.
     """
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    performers = models.ManyToManyField(
-        DependentPerformerProfile,
-        related_name="performers_under_care"
-    )
+    performances = models.ManyToManyField(
+        Performance,
+        related_name="performances_under_care")
 
     class Meta:
         verbose_name = 'teacher'
