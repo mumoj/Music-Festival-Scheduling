@@ -30,7 +30,6 @@ class CustomUser(AbstractUser):
     middle_name = models.CharField(_('middle name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30)
     is_active = models.BooleanField(_('active'), default=True)
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
     role = models.CharField(max_length=50, choices=ROLES, default='TEACHER')
 
     objects = CustomUserManager()
@@ -83,6 +82,10 @@ class DependentPerformerProfile(models.Model):
     to register them, train them and generally be responsible for their performance groups.
     """
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    institution = models.ForeignKey(
+        to=Institution,
+        on_delete=models.CASCADE,
+        null=True)
     performance = models.ManyToManyField(Performance)
 
     class Meta:
