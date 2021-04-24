@@ -17,7 +17,9 @@ class UserAdapter(DefaultAccountAdapter):
         return super().save_user(request, user, form, commit=commit)
 
     def respond_email_verification_sent(self, request, user):
-        return HttpResponseRedirect(reverse("accounts:account_email_verification_sent"))
+        return HttpResponseRedirect(
+            reverse("accounts:account_email_verification_sent")
+        )
 
     def get_email_confirmation_url(self, request, emailconfirmation):
         """Constructs the email confirmation (activation) url.
