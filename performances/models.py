@@ -11,38 +11,37 @@ class Institution(models.Model):
         ('SECONDARY_SCHOOL', 'Secondary School'),
         ('UNIVERSITY', 'University'),
         ('COLLAGE', 'Collage'),
-        ('OTHERS', 'Others')
+        ('OTHERS', 'Others'))
 
-    )
     name = models.CharField(max_length=100, blank=False)
     head_of_institution = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-    )
+        related_name='institution_head')
     institution_type = models.CharField(
         choices=CHOICES,
-        max_length=50
-    )
+        max_length=50)
     zone = models.CharField(max_length=50, blank=False)
     sub_county = models.CharField(max_length=50, blank=False)
     county = models.CharField(max_length=50, blank=False)
     region = models.CharField(max_length=50, blank=False)
+
+    def __str__(self):
+        return self.name
 
 
 class Class(models.Model):
     """Defines  a performance category allowed in the Festival."""
     CHOICES = (
         ('PRELIMINARY_LEVEL', 'Preliminary Level'),
-        ('DIRECT_ENTRY', 'Direct Entry')
-    )
-    class_code = models.CharField(max_length=10,
-                                  primary_key=True)
+        ('DIRECT_ENTRY', 'Direct Entry'))
+
+    class_code = models.CharField(max_length=10, primary_key=True)
     class_name = models.CharField(max_length=250)
     entry_level = models.CharField(
         choices=CHOICES,
         default='PRELIMINARY_LEVEL',
-        max_length=50,
-    )
+        max_length=50)
 
 
 class Performance(models.Model):
@@ -51,8 +50,7 @@ class Performance(models.Model):
     """
     PERFORMANCE_TYPES = (
         ('INDEPENDENT', 'Independent'),
-        ('DEPENDENT', 'Dependent'),
-    )
+        ('DEPENDENT', 'Dependent'))
 
     GROUP_SIZES = None
 
@@ -61,7 +59,7 @@ class Performance(models.Model):
         choices=PERFORMANCE_TYPES,
         max_length=15)
     # The group leader can be a teacher in charge of a dependent performance
-    # or an independent performer leading the rest of an independent performance.
+    # or an independent performer leading  an independent performance.
     group_leader = models.ForeignKey(
         to=settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
