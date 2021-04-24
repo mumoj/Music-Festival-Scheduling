@@ -30,7 +30,7 @@ from .serializers import (
     DependentPerformerProfileSerializer
 )
 
-from .permission_groups import HEADS_OF_INSTITUTION_GROUP
+from .permission_groups import set_heads_of_institutions_group
 
 
 class CustomRegistrationView(RegisterView):
@@ -49,13 +49,11 @@ class CustomRegistrationView(RegisterView):
         response = Response(
             self.get_response_data(user),
             status=status.HTTP_201_CREATED,
-            headers=headers
-            )
+            headers=headers)
 
-        if request.data['role'] == 'SPONSOR':
-            print(user.pk)
-            sponsor_profile = SponsorProfile.objects.create(user=user)
-            sponsor_profile.save()
+        if request.data['role'] == 'HEAD_OF_INSTITUTION':
+            user.groups.add(set_heads_of_institutions_group())
+            Institution.objects.create(head_of_institution=user)
             return response
 
         elif request.data['role'] == 'DEPENDENT_PERFORMER':
@@ -64,9 +62,9 @@ class CustomRegistrationView(RegisterView):
             dependent_performer_profile.save()
             return response
 
-        elif request.data['role'] == 'HEAD_OF_INSTITUTION':
-            user.groups.add(HEADS_OF_INSTITUTION_GROUP)
-            Institution.objects.create(head_of_institution=user)
+        elif request.data['role'] == 'SPONSOR':
+            sponsor_profile = SponsorProfile.objects.create(user=user)
+            sponsor_profile.save()
             return response
 
         else:
