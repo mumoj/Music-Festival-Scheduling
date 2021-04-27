@@ -20,17 +20,16 @@ from .models import (
     CustomUser, TeacherProfile,
     SponsorProfile, AdjudicatorProfile,
     DependentPerformerProfile,
-    IndependentPerformerProfile
-)
+    IndependentPerformerProfile)
 
 from .serializers import (
     TeacherProfileSerializer,
     SponsorProfileSerializer,
     AdjudicatorProfileSerializer,
-    DependentPerformerProfileSerializer
-)
+    DependentPerformerProfileSerializer)
 
-from .permission_groups import set_heads_of_institutions_group
+from .permission_groups import (
+    heads_of_institutions_group, teachers_group)
 
 
 class CustomRegistrationView(RegisterView):
@@ -52,8 +51,14 @@ class CustomRegistrationView(RegisterView):
             headers=headers)
 
         if request.data['role'] == 'HEAD_OF_INSTITUTION':
-            user.groups.add(set_heads_of_institutions_group())
-            Institution.objects.create(head_of_institution=user)
+            user.groups.add(heads_of_institutions_group())
+            institution = Institution.objects.create(head_of_institution=user)
+            institution.save()
+            return response
+
+        elif request.data['role'] == 'TEACHER':
+            user.groups.add(teachers_group())
+            TeacherProfile.objects.create(user=user)
             return response
 
         elif request.data['role'] == 'DEPENDENT_PERFORMER':
@@ -103,3 +108,15 @@ class AddDependentPerformerProfile(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     lookup_field = 'user'
     lookup_url_kwarg = 'dependent_performer'
+
+
+class AddTeacherProfile(RetrieveUpdateAPIView):
+    """
+    Once registered, a teacher has to update their profile details
+    as they are germane to their role in the system.
+    """
+    queryset = TeacherProfile.objects.all()
+    serializer_class = TeacherProfileSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    lookup_field = 'user'
+    lookup_url_kwarg = 'teacher'

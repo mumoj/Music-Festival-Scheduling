@@ -5,6 +5,7 @@ from rest_auth.views import PasswordResetView, PasswordResetConfirmView
 from rest_auth.views import LoginView, LogoutView
 from .views import (
     CustomRegistrationView,
+    AddTeacherProfile,
     AddSponsorProfile,
     AddDependentPerformerProfile)
 
@@ -21,6 +22,8 @@ urlpatterns = [
     path('dependent_performer/<int:dependent_performer>/details/',
          AddDependentPerformerProfile.as_view(),
          name='update-dependent_performer'),
+    path('teacher/<int:teacher>/details/', AddTeacherProfile.as_view(),
+         name='update-teacher'),
 
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),

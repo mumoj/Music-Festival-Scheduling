@@ -91,23 +91,23 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class DependentPerformerProfileSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = DependentPerformerProfile
         fields = ('institution', 'performance_class', 'sponsor',)
 
 
 class IndependentPerformerProfileSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = IndependentPerformerProfile
-        fields = ()
 
 
 class TeacherProfileSerializer(serializers.ModelSerializer):
-    user = CustomUserSerializer(required=True)
 
     class Meta:
         model = TeacherProfile
-        fields = ()
+        fields = ('institution', 'performances')
 
 
 class SponsorProfileSerializer(serializers.ModelSerializer):
