@@ -7,7 +7,8 @@ from .views import (
     CustomRegistrationView,
     AddTeacherProfile,
     AddSponsorProfile,
-    AddDependentPerformerProfile)
+    AddDependentPerformerProfile,
+    AddIndependentPerformerProfile)
 
 app_name = 'accounts'
 urlpatterns = [
@@ -22,6 +23,10 @@ urlpatterns = [
     path('dependent_performer/<int:dependent_performer>/details/',
          AddDependentPerformerProfile.as_view(),
          name='update-dependent_performer'),
+    path('independent_performer/<int:independent_performer>/details/',
+         AddIndependentPerformerProfile.as_view(),
+         name='update-independent_performer'),
+
     path('teacher/<int:teacher>/details/', AddTeacherProfile.as_view(),
          name='update-teacher'),
 

@@ -26,7 +26,8 @@ from .serializers import (
     TeacherProfileSerializer,
     SponsorProfileSerializer,
     AdjudicatorProfileSerializer,
-    DependentPerformerProfileSerializer)
+    DependentPerformerProfileSerializer,
+    IndependentPerformerProfileSerializer)
 
 from .permission_groups import (
     heads_of_institutions_group, teachers_group)
@@ -59,6 +60,12 @@ class CustomRegistrationView(RegisterView):
         elif request.data['role'] == 'TEACHER':
             user.groups.add(teachers_group())
             TeacherProfile.objects.create(user=user)
+            return response
+
+        elif request.data['role'] == 'INDEPENDENT_PERFORMER':
+            independent_performer_profile = IndependentPerformerProfile.\
+                objects.create(user=user)
+            independent_performer_profile.save()
             return response
 
         elif request.data['role'] == 'DEPENDENT_PERFORMER':
@@ -108,6 +115,18 @@ class AddDependentPerformerProfile(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     lookup_field = 'user'
     lookup_url_kwarg = 'dependent_performer'
+
+
+class AddIndependentPerformerProfile(RetrieveUpdateAPIView):
+    """
+    Once registered, an independent performer has to update their profile details
+    as they are germane to their role in the system.
+    """
+    queryset = IndependentPerformerProfile.objects.all()
+    serializer_class = IndependentPerformerProfileSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    lookup_field = 'user'
+    lookup_url_kwarg = 'independent_performer'
 
 
 class AddTeacherProfile(RetrieveUpdateAPIView):

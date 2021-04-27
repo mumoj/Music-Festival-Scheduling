@@ -101,6 +101,7 @@ class IndependentPerformerProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IndependentPerformerProfile
+        fields = ('institution', 'performances')
 
 
 class TeacherProfileSerializer(serializers.ModelSerializer):

@@ -9,6 +9,7 @@ from accounts.models import (
     TeacherProfile,
     SponsorProfile,
     DependentPerformerProfile,
+    IndependentPerformerProfile,
     CustomUser)
 
 from performances.models import Institution
@@ -42,7 +43,7 @@ class HeadOfInstitutionRegistrationTest(APITestCase):
 
 class DependentPerformerRegistrationAndProfileViewTests(APITestCase):
     """
-    Test how sponsor registration is handled by the system.
+    Test how a dependent performer registration is handled by the system.
     """
 
     def setUp(self) -> None:
@@ -65,7 +66,7 @@ class DependentPerformerRegistrationAndProfileViewTests(APITestCase):
 
     def test_add_dependent_profile_view(self):
         """
-        Test sponsors are authenticated and
+        Test dependent performers are authenticated when adding their profiles and
         they and they only are able to add their own profile instances.
         """
         self.user = CustomUser.objects.get(email=self.data['email'])
@@ -76,12 +77,55 @@ class DependentPerformerRegistrationAndProfileViewTests(APITestCase):
         update_url = reverse(
             'accounts:update-dependent_performer',
             kwargs={'dependent_performer': self.dependent_performer_profile.pk})
-
         response = self.client.put(
             update_url,
             {'institution': self.institution.pk, 'performance': [self.performance.pk]},
             format='json')
-        pprint(response.__dict__)
+
+        self.assertEqual(response.status_code, 200)
+
+
+class IndependentPerformerRegistrationAndProfileViewTests(APITestCase):
+    """
+    Test how an independent performer registration is handled by the system.
+    """
+
+    def setUp(self) -> None:
+        self.registration_url = reverse('accounts:register')
+        self.data = {
+            'first_name': 'Joe',
+            'middle_name': 'Mlachake',
+            'last_name': 'Doe',
+            'email': 'mlachakejoe@gmail.com',
+            'role': 'INDEPENDENT_PERFORMER',
+            'password1': '1234',
+            'password2': '1234',
+        }
+        self.client.post(self.registration_url, self.data, format='json')
+        self.independent_performer_profile = IndependentPerformerProfile.objects.get(
+            user__email=self.data['email'])
+
+    def test_an_independent_performer_profile_instance_is_created_on_registration(self):
+        self.assertIsInstance(self.independent_performer_profile, IndependentPerformerProfile)
+
+    def test_add_independent_profile_view(self):
+        """
+        Test independent performers are authenticated when adding their profiles and
+        they and they only are able to add their own profile instances.
+        """
+        self.user = CustomUser.objects.get(email=self.data['email'])
+        self.client.login(email=self.user.email, password=1234)
+        self.performance = baker.make('performances.Performance')
+        self.institution = baker.make('performances.Institution')
+
+        update_url = reverse(
+            'accounts:update-independent_performer',
+            kwargs={'independent_performer': self.independent_performer_profile.pk})
+        response = self.client.put(
+            update_url,
+            {'institution': self.institution.pk, 'performances': [self.performance.pk]},
+            format='json')
+
         self.assertEqual(response.status_code, 200)
 
 
