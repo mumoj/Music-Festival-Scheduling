@@ -62,9 +62,10 @@ class Performance(models.Model):
     performance_type = models.CharField(
         choices=PERFORMANCE_TYPES,
         max_length=15)
-    # The group leader can be a teacher in charge of a dependent performance
-    # or an independent performer leading  an independent performance.
+    performance_class = models.ForeignKey(Class, on_delete=models.CASCADE)
     group_leader = models.ForeignKey(
+        # The group leader can be a teacher in charge of a dependent performance
+        # or an independent performer leading  an independent performance.
         to=settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='performance_group_leader')
@@ -88,3 +89,22 @@ class Performance(models.Model):
     national_marks = models.IntegerField(null=True)
 
 
+class Event(models.Model):
+    """Define an event in the festival."""
+    EVENT_LEVELS = (
+        ('ZONAL', 'Zonal'),
+        ('SUB-COUNTY', 'Sub-County'),
+        ('COUNTY', 'County'),
+        ('REGIONAL', 'Regional'),
+        ('NATIONAL', 'National'),
+    )
+    venue = models.CharField(max_length=50)
+    event_level = models.CharField(
+        choices=EVENT_LEVELS,
+        max_length=15)
+
+
+class Theater(models.Model):
+    """Define the theatres in an event"""
+    venue = models.ForeignKey(Event, on_delete=models.CASCADE)
+    capacity = models.IntegerField()
