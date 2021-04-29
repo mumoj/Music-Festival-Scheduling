@@ -38,10 +38,14 @@ class Class(models.Model):
 
     class_code = models.CharField(max_length=10, primary_key=True)
     class_name = models.CharField(max_length=250)
+    performance_duration = models.IntegerField()
     entry_level = models.CharField(
         choices=CHOICES,
         default='PRELIMINARY_LEVEL',
         max_length=50)
+
+    def __str__(self):
+        return self.class_code
 
 
 class Performance(models.Model):
