@@ -3,3 +3,4 @@ __pycache__/
 .coverage
 htmlcov/
 .mypy_cache
+population_scripts/
