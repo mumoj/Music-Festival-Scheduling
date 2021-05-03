@@ -72,7 +72,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            'accounts/templates/'
+            'accounts/templates/',
+            'performances/templates/',
         ],
         'APP_DIRS': True,
         'OPTIONS': {
