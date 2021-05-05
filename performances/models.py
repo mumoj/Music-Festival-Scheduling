@@ -64,8 +64,8 @@ class Performance(models.Model):
         max_length=15)
     performance_class = models.ForeignKey(Class, on_delete=models.CASCADE)
     group_leader = models.ForeignKey(
-        # The group leader can be a teacher in charge of a dependent performance
-        # or an independent performer leading  an independent performance.
+        help_text="The group leader can be a teacher in charge of a dependent performance "
+                  "or an independent performer leading  an independent performance.",
         to=settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='performance_group_leader')
@@ -107,4 +107,5 @@ class Event(models.Model):
 class Theater(models.Model):
     """Define the theatres in an event"""
     venue = models.ForeignKey(Event, on_delete=models.CASCADE)
+    available = models.BooleanField()
     capacity = models.IntegerField()
