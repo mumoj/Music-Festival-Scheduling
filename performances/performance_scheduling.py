@@ -10,7 +10,7 @@ from performances.models import Class
 def session_performance_scheduling(ordered_classes: Union[QuerySet, List[Class]], session_time: int):
     """
     Schedule class performances into the defined sessions in  a festival event day,
-    giving priority to classes with the list performance_duration
+    giving priority to classes with the least performance_duration
     """
 
     unscheduled_performances = []
@@ -83,3 +83,5 @@ def sessions_in_a_day() -> tuple:
 def get_session_duration(a: str, b: str):
     """Find the time taken to complete each session"""
     return datetime.datetime.strptime(b, "%H%M") - datetime.datetime.strptime(a, "%H%M")
+
+
