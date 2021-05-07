@@ -106,6 +106,10 @@ class Event(models.Model):
 
 class Theater(models.Model):
     """Define the theatres in an event"""
+    name = models.CharField(max_length=15)
     venue = models.ForeignKey(Event, on_delete=models.CASCADE)
     available = models.BooleanField()
     capacity = models.IntegerField()
+
+    def __str__(self):
+        return self.name
