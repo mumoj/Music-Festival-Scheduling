@@ -103,6 +103,9 @@ class Event(models.Model):
         choices=EVENT_LEVELS,
         max_length=15)
 
+    def __str__(self):
+        return self.venue
+
 
 class Theater(models.Model):
     """Define the theatres in an event"""
