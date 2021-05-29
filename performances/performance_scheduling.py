@@ -1,12 +1,9 @@
 import datetime
-import asyncio
-from pprint import pprint
 from typing import Union, List
 
 from django.db.models import QuerySet
-from django.db.models.query import EmptyQuerySet
 
-from performances.models import Class, Event
+from performances.models import Class
 
 
 def schedule_performances_for_each_theater(
@@ -39,6 +36,7 @@ def schedule_performances_for_each_theater(
 
     """
 
+    theaters_assigned_performances_per_day: dict
     total_time_taken = total_time_taken_by_all_classes(classes=all_classes)
     theaters = event.theater_set.all()
 
