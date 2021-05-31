@@ -88,6 +88,9 @@ class Performance(models.Model):
     regional_marks = models.IntegerField(null=True)
     national_marks = models.IntegerField(null=True)
 
+    def __str__(self):
+        return self.performer_name
+
 
 class Event(models.Model):
     """Define an event in the festival."""
