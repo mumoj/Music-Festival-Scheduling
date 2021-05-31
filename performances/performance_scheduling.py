@@ -289,11 +289,11 @@ def sessions_in_a_day() -> tuple:
     third_session_end: str = '1700'
 
     first_session = (
-        get_session(a=first_session_start, b=first_session_end), 'First Session.')
+        get_session(a=first_session_start, b=first_session_end))
     second_session = (
-        get_session(a=second_session_start, b=second_session_end), 'Second Session.')
+        get_session(a=second_session_start, b=second_session_end))
     third_session = (
-        get_session(a=third_session_start, b=third_session_end), 'Third Session.')
+        get_session(a=third_session_start, b=third_session_end))
 
     return first_session, second_session, third_session
 
@@ -317,4 +317,4 @@ def get_session(a: str, b: str):
     """
     timedelta = datetime.datetime.strptime(b, "%H%M") - datetime.datetime.strptime(a, "%H%M")
     timedelta = timedelta.seconds / 60  # Convert to minutes
-    return timedelta
+    return timedelta, datetime.datetime.strptime(a, "%H%M")
