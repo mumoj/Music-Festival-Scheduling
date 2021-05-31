@@ -102,6 +102,7 @@ class Event(models.Model):
         ('NATIONAL', 'National'),
     )
     venue = models.CharField(max_length=50)
+    start_date = models.DateField()
     event_level = models.CharField(
         choices=EVENT_LEVELS,
         max_length=15)
