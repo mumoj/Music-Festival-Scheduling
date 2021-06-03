@@ -4,9 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <script type="text/javascript" src= {% static 'js/bootstrap.bundle.min.js' %}></script>
-    {% block style %}{% endblock %}
+    <link rel="stylesheet" href="/home/jack/PycharmProjects/Isukuta/isukuta/performances/static/css/bootstrap.min.css">
+    <script type="text/javascript" src= "/home/jack/PycharmProjects/Isukuta/isukuta/performances/static/js/bootstrap.bundle.min.js"></script>
+    {% block style %}
+        <style>
+            @font-face {
+                font-family: 'Monoton', Cursive;
+                font-style: normal;
+                font-weight: 300;
+                src: local(''),
+                    url("/home/jack/PycharmProjects/Isukuta/isukuta/performances/static/fonts/monoton-v10-latin-regular.woff2") format('woff2');
+            }
+            @font-face {
+                font-family: 'Montserrat', 'sans-serif';
+                font-style: normal;
+                font-weight: 300;
+                src: local(''),
+                    url('/home/jack/PycharmProjects/Isukuta/isukuta/performances/static/fonts/montserrat-v15-latin-regular.woff2') format('woff');
+            }
+        </style>
+    {% endblock %}
 </head>
 <body>
     {% block content%}{% endblock %}
