@@ -3,6 +3,18 @@ from config import settings
 
 
 # Create your models here.
+class Locality(models.Model):
+    """A geographical locality within which schools compete."""
+    zone = models.CharField(max_length=20)
+    sub_county = models.CharField(max_length=20)
+    county = models.CharField(max_length=20)
+    region = models.CharField(max_length=20)
+    country = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.zone
+
+
 class Institution(models.Model):
     """Defines an Institution participating in the Festival."""
     CHOICES = (
@@ -21,10 +33,7 @@ class Institution(models.Model):
     institution_type = models.CharField(
         choices=CHOICES,
         max_length=50)
-    zone = models.CharField(max_length=50, blank=False)
-    sub_county = models.CharField(max_length=50, blank=False)
-    county = models.CharField(max_length=50, blank=False)
-    region = models.CharField(max_length=50, blank=False)
+    locality = models.ForeignKey(Locality, on_delete=models.DO_NOTHING, null=True)
 
     def __str__(self):
         return self.name
@@ -102,6 +111,7 @@ class Event(models.Model):
         ('NATIONAL', 'National'),
     )
     venue = models.CharField(max_length=50)
+    locality = models.ForeignKey(Locality, on_delete=models.DO_NOTHING, null=True)
     start_date = models.DateField()
     event_level = models.CharField(
         choices=EVENT_LEVELS,
@@ -120,3 +130,6 @@ class Theater(models.Model):
 
     def __str__(self):
         return self.name
+
+
+
