@@ -1,10 +1,122 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'performances_base.html' %}
+{% block title %} Event Timetable {% endblock %}
+{% block style %}
+    <style>
+        .keep-together {
+            page-break-inside: avoid;
+        }
 
-</body>
-</html>
+        .break-before {
+            page-break-before: always;
+        }
+
+        .break-after {
+            page-break-after: always;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            width: 100%;
+        }
+
+        h1{
+            font-family: Monoton, Cursive, cursive;
+        }
+
+        h1,h2, h4 {
+            padding-bottom: 0.2em;
+            text-align: center;
+        }
+        small {
+            text-transform:capitalize;
+            text-decoration: underline;
+        }
+
+        .table-warning{
+            background-color: rgba(187, 208, 91, 0.91);
+        }
+        .table-bordered{
+            border-collapse: collapse;
+            border-style: hidden;
+            border-radius: 0.8em;
+        }
+        .table-bordered td, .table-bordered th {
+            word-wrap: break-word;
+            vertical-align: middle;
+            border: 1px solid rgba(128, 127, 104, 0.93);
+        }
+        th{
+            text-align: center;
+        }
+        .session-heading{
+            width: 10px;
+            vertical-align: middle;
+            color: rgba(128, 127, 104, 0.93);
+        }
+        .sub-table {
+            border-style: hidden;
+            border-radius: 0.8em;
+        }
+        .sub-table td{
+            border-left: none;
+            border-right: 1px solid;
+            border-top:none;
+            border-bottom:none;
+            color: black;
+            text-align: left;
+            width: 35%;
+        }
+        .performance-period{
+            width: 20%;
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-danger text-center" role="alert">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    {% if time_table %}
+        <h1>The Kenya Music Festival </h1>
+        <h2> Venue : {{ event.venue }}
+            <p><small> {{event_level  }} Levels </small></p>
+        </h2>
+        {% for theater, days in time_table.items %}
+            <div class="keep-together break-after break-before theater pb-5 pt-2">
+                    <table class="keep-together break-after break table table-bordered table-warning py-2"> {% for day, sessions in days.items %}
+                        <thead>
+                            <tr><th style="border-color:rgba(128, 127, 104, 0.93)" colspan="2" scope="colgroup"><h4>Theater:{{theater}} | Day:{{ day }}</h4> </th> </tr>
+                        </thead>
+                        <tbody>
+                            {% for session,performances in sessions.items %}
+                                <tr>
+                                    <th class="session-heading align-middle" scope="rowgroup"> {{ session|date:" h:i a" }} Session.</th>
+                                    <td>
+                                        <table class="sub-table table table-striped"> {% for performance in performances %}
+                                            <tr>{% for p, period in performance.items  %}
+                                                <th scope="row" class="performance-period">{{ period.0|date:" h:i a" }} - {{ period.1|date:" h:i a" }} </th>
+                                                <td>{{p}}</td>
+                                            {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                        </table>
+
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    {% endfor %}
+                    </table>
+            </div>
+        {% endfor  %}
+    {% endif %}
+{% endblock %}
