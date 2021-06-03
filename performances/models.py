@@ -62,7 +62,7 @@ class Class(models.Model):
         verbose_name_plural = 'classes'
 
     def __str__(self):
-        return self.class_code
+        return self.class_name
 
 
 class Performance(models.Model):
@@ -75,7 +75,7 @@ class Performance(models.Model):
 
     GROUP_SIZES = None
 
-    performer_name = models.CharField(max_length=50, null=True)
+    performer_name = models.CharField(max_length=50, null=True, blank=True)
     performance_type = models.CharField(
         choices=PERFORMANCE_TYPES,
         max_length=15)
@@ -97,30 +97,27 @@ class Performance(models.Model):
         on_delete=models.CASCADE,
         related_name='performance_sponsor',
         null=True)
-    institution = models.OneToOneField(Institution, on_delete=models.CASCADE)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
 
-    zonal_marks = models.IntegerField(null=True)
-    sub_county_marks = models.IntegerField(null=True)
-    county_marks = models.IntegerField(null=True)
-    regional_marks = models.IntegerField(null=True)
-    national_marks = models.IntegerField(null=True)
-
-    def get_performance_name(self):
-        name = '%s %s ' % (self.performance_class, self.institution)
-        return name.strip()
+    zonal_marks = models.IntegerField(null=True, blank=True)
+    sub_county_marks = models.IntegerField(null=True, blank=True)
+    county_marks = models.IntegerField(null=True, blank=True)
+    regional_marks = models.IntegerField(null=True, blank=True)
+    national_marks = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        self.get_performance_name()
+        performance_name = '%s - %s ' % (self.performance_class, self.institution)
+        return performance_name
 
 
 class Event(models.Model):
     """Define an event in the festival."""
     EVENT_LEVELS = (
-        ('ZONAL', 'Zonal'),
+        ('ZONE', 'Zone'),
         ('SUB-COUNTY', 'Sub-County'),
         ('COUNTY', 'County'),
-        ('REGIONAL', 'Regional'),
-        ('NATIONAL', 'National'),
+        ('REGION', 'Region'),
+        ('NATION', 'Nation'),
     )
     venue = models.CharField(max_length=50)
     locality = models.ForeignKey(Locality, on_delete=models.DO_NOTHING, null=True)
@@ -130,7 +127,8 @@ class Event(models.Model):
         max_length=15)
 
     def __str__(self):
-        return self.venue
+        event = '%s - %s' % (self.venue, self.event_level)
+        return event
 
 
 class Theater(models.Model):
