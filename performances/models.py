@@ -75,7 +75,7 @@ class Performance(models.Model):
 
     GROUP_SIZES = None
 
-    performer_name = models.CharField(max_length=50)
+    performer_name = models.CharField(max_length=50, null=True)
     performance_type = models.CharField(
         choices=PERFORMANCE_TYPES,
         max_length=15)
@@ -105,8 +105,12 @@ class Performance(models.Model):
     regional_marks = models.IntegerField(null=True)
     national_marks = models.IntegerField(null=True)
 
+    def get_performance_name(self):
+        name = '%s %s ' % (self.performance_class, self.institution)
+        return name.strip()
+
     def __str__(self):
-        return self.performer_name
+        self.get_performance_name()
 
 
 class Event(models.Model):
@@ -138,6 +142,3 @@ class Theater(models.Model):
 
     def __str__(self):
         return self.name
-
-
-
