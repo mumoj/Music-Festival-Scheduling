@@ -11,6 +11,10 @@ class Locality(models.Model):
     region = models.CharField(max_length=20)
     country = models.CharField(max_length=20)
 
+    class Meta:
+        verbose_name = 'locality'
+        verbose_name_plural = 'localities'
+
     def __str__(self):
         return self.zone
 
@@ -52,6 +56,10 @@ class Class(models.Model):
         choices=CHOICES,
         default='PRELIMINARY_LEVEL',
         max_length=50)
+
+    class Meta:
+        verbose_name = 'class'
+        verbose_name_plural = 'classes'
 
     def __str__(self):
         return self.class_code
