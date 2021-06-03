@@ -1,10 +1,37 @@
 import datetime
+from pprint import pprint
 from typing import Union, List
 
 from django.db.models import QuerySet
 
-from performances.models import Class
+from performances.models import Class, Performance
 from django.contrib import messages
+
+
+def generate_time_table(theaters_assigned_performances_per_day: dict):
+    all_days_dict: dict = {}
+    for theater, days in theaters_assigned_performances_per_day.items():
+        all_sessions_dict: dict = {}
+        for day, sessions in days.items():
+            for session, performances in sessions.items():
+                performance_period_dicts: list = append_performance_start_and_end_time(
+                    session_start=session, performances=performances)
+                all_sessions_dict.update({session: performance_period_dicts})
+
+        all_days_dict = {day: all_sessions_dict for day in days}
+    return {theater: all_days_dict for theater in theaters_assigned_performances_per_day}
+
+
+def append_performance_start_and_end_time(session_start, performances: Union[QuerySet, List[Performance]]):
+    start_time = session_start
+    performance_period_dicts: list = []
+    for performance in performances:
+        end_time = start_time + datetime.timedelta(
+            minutes=performance.performance_class.performance_duration)
+        performance_dict = {performance: (start_time, end_time)}
+        performance_period_dicts.append(performance_dict)
+        start_time = end_time
+    return performance_period_dicts
 
 
 def schedule_performances_for_each_theater(
@@ -57,6 +84,7 @@ def schedule_performances_for_each_theater(
         day_performances: dict = {day: {}}
         theaters_assigned_performances_per_day[theater].update(day_performances)
         session_performances: dict = {session[1]: [] for session in festival_sessions_in_a_day}
+
         # Initialize an empty list for each session
         theaters_assigned_performances_per_day[theater][day].update(session_performances)
         for performance_class in performance_classes:
@@ -139,17 +167,20 @@ def event_day_scheduling(
                 session_time=session[0],
                 scheduled_performances=[],
                 balance_performances=left_over_performances)
+
             scheduled_performances = results[0]
             performances_in_a_day_per_session[session[1]] = \
                 performances_in_a_day_per_session[session[1]] + scheduled_performances
             balance_performances = results[1]
             left_over_performances = balance_performances
             festival_sessions[i][0] = 0  # Record depletion of session time.
+
             continue
         else:
             if time_taken_by_left_over_performances > session[0]:
                 performances_in_a_day_per_session[session[1]] = left_over_performances
                 festival_sessions[i][0] = 0  # Record depletion of session time.
+                
                 continue
 
     if class_performances:  # Set whatever performances remain to be scheduled the next day.

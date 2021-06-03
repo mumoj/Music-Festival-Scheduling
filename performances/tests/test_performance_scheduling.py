@@ -10,7 +10,8 @@ from performances.performance_scheduling import (
     total_time_taken_by_all_classes,
     divide_classes_among_theaters,
     event_day_scheduling,
-    schedule_performances_for_each_theater)
+    schedule_performances_for_each_theater,
+    generate_time_table)
 
 
 class PerformanceSchedulingTests(TestCase):
@@ -148,3 +149,11 @@ class PerformanceSchedulingTests(TestCase):
                              [1][datetime.datetime(1900, 1, 1, 8, 0)]),
                          5)
 
+        self.theaters = schedule_performances_for_each_theater(
+            event=self.event,
+            all_classes=self.total_classes)
+        pprint(generate_time_table(theaters_assigned_performances_per_day=self.theaters))
+
+    def test_append_performance_start_and_end_time(self):
+
+        pass
