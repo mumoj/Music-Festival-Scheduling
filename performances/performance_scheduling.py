@@ -46,7 +46,7 @@ def schedule_performances_for_each_theater(
 
     Returns
     -------
-        theaters_assigned_performances_per_day: dict
+        theaters_assigned_performances: dict
              A dict with the distribution of performances among theaters and festival sessions
             For example:
                 <Theater: Mandela's Hall>: {1: {datetime.datetime(1900, 1, 1, 8, 0):[
@@ -64,11 +64,10 @@ def schedule_performances_for_each_theater(
 
     """
 
-    theaters_assigned_performances_per_day: dict
     total_time_taken = total_time_taken_by_all_classes(classes=all_classes)
     theaters = event.theater_set.all()
 
-    theaters_assigned_performances = divide_classes_among_theaters(
+    theaters_assigned_performances: dict = divide_classes_among_theaters(
         total_time_taken=total_time_taken,
         classes=all_classes,
         theaters=theaters)
@@ -76,18 +75,17 @@ def schedule_performances_for_each_theater(
     for theater, value in theaters_assigned_performances.items():
         performance_classes: list = theaters_assigned_performances[theater]
         theaters_assigned_performances[theater] = {}  # Initialize a dict for sessions in an event day.
-        theaters_assigned_performances_per_day: dict = theaters_assigned_performances
 
         day = 1
-        left_over_performances: list = []
+        left_over_performances: list = []  # To be updated at the end of each day.
         festival_sessions_in_a_day = list(sessions_in_a_day())
         day_performances: dict = {day: {}}
-        theaters_assigned_performances_per_day[theater].update(day_performances)
+        theaters_assigned_performances[theater].update(day_performances)
         session_performances: dict = {session[1]: [] for session in festival_sessions_in_a_day}
 
         # Initialize an empty list for each session
-        theaters_assigned_performances_per_day[theater][day].update(session_performances)
-        for performance_class in performance_classes:
+        theaters_assigned_performances[theater][day].update(session_performances)
+        for i, performance_class in enumerate(performance_classes):
             results: dict = event_day_scheduling(
                 left_over_performances=left_over_performances,
                 festival_sessions=festival_sessions_in_a_day,
@@ -95,23 +93,25 @@ def schedule_performances_for_each_theater(
                 class_performances=list(performance_class.performance_set.all()))
 
             for session_key, performances in results[0].items():  # Add performances to each session.
-                theaters_assigned_performances_per_day[theater][day][session_key] += performances
+                theaters_assigned_performances[theater][day][session_key] += performances
 
+            next_class_duration: int = performance_classes[i+1].performance_duration
+            # The incoming class' performance duration.
             for session in results[2]:  # Iterate over balance  sessions' time
-                if session[0] >= 5:
-                    festival_sessions_in_a_day = results[2]  # Use whatever balance session time remains to depletion.
+                if session[0] >= next_class_duration:
+                    festival_sessions_in_a_day = results[2]  # Use whatever balance session time  remains to depletion.
                     break
-            else:
+            else:  # Start a new event day if the next class' performance duration does not fit into any session time.
                 festival_sessions_in_a_day = list(sessions_in_a_day())
                 day += 1
                 day_performances: dict = {day: {}}
-                theaters_assigned_performances_per_day[theater].update(day_performances)
+                theaters_assigned_performances[theater].update(day_performances)
                 session_performances: dict = {session[1]: [] for session in festival_sessions_in_a_day}
-                theaters_assigned_performances_per_day[theater][day].update(session_performances)
+                theaters_assigned_performances[theater][day].update(session_performances)
 
             left_over_performances = results[1]
 
-    return theaters_assigned_performances_per_day
+    return theaters_assigned_performances
 
 
 def event_day_scheduling(
