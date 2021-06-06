@@ -11,6 +11,6 @@ urlpatterns = [
     path('register-institution/<int:institution_pk>',
          RegisterInstitutions.as_view(),
          name='register-institution'),
-    path('schedule-performances/<str:event>',
+    path('schedule-performances/<int:festival_event>',
          schedule_performances, name='schedule-performances')
 ]
