@@ -120,6 +120,10 @@ def event_day_scheduling(
         performances_in_a_day_per_session: dict,
         class_performances: list):
     """
+    Schedule performances into the set event day session,
+    carrying over left over class performances into the next session,
+    and sometimes day.
+
     Parameters
     ----------
     class_performances: list
@@ -153,15 +157,17 @@ def event_day_scheduling(
                 class_performances=class_performances,
                 session_time=session[0],
                 scheduled_performances=[],
-                balance_performances=[])
+                balance_performances=[])  # Schedule the passed class to the remaining session time.
 
             if results[0]:  # If performances are scheduled to the session.
-                performances_in_a_day_per_session[session[1]] = results[0]
+                scheduled_performances = results[0]
+                performances_in_a_day_per_session[session[1]] = \
+                    performances_in_a_day_per_session[session[1]] + scheduled_performances
                 festival_sessions[i][0] = results[2]  # Update the session time.
                 class_performances = results[1]  # Update class_performances for next session.
 
         elif time_taken_by_left_over_performances > session[0]:
-            # If leftover performances do not fit into session time.
+            # If leftover performances do not fit into session time, schedule the passed class directly .
             results: tuple = class_performances_scheduling(
                 class_performances=left_over_performances,
                 session_time=session[0],
@@ -177,7 +183,7 @@ def event_day_scheduling(
 
             continue
         else:
-            if time_taken_by_left_over_performances > session[0]:
+            if time_taken_by_left_over_performances == session[0]:
                 performances_in_a_day_per_session[session[1]] = left_over_performances
                 festival_sessions[i][0] = 0  # Record depletion of session time.
                 
