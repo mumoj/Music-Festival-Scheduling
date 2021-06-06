@@ -4,10 +4,12 @@ from pprint import pprint
 from model_bakery import baker
 from django.test import TestCase
 from performances.performance_scheduling import (
+    get_event,
     get_session,
     sessions_in_a_day,
+    get_performances_to_be_performed,
     class_performances_scheduling,
-    total_time_taken_by_all_classes,
+    total_time_taken_by_all_event_performances,
     divide_classes_among_theaters,
     event_day_scheduling,
     schedule_performances_for_each_theater,
@@ -17,6 +19,8 @@ from performances.performance_scheduling import (
 class PerformanceSchedulingTests(TestCase):
     def setUp(self) -> None:
         self.all_classes = baker.make_recipe('performances.tests.performance_class', 5)
+        self.event = baker.make_recipe('performances.tests.event')
+        get_event(event=self.event)
 
         for p_class in self.all_classes:
             performances = baker.make(
@@ -29,6 +33,7 @@ class PerformanceSchedulingTests(TestCase):
         self.class_performances = baker.make(
             'performances.Performance',
             performance_class=self.performance_class, _quantity=5)
+
         self.unscheduled_performances = []
         self.session_performances = []
 
@@ -48,6 +53,11 @@ class PerformanceSchedulingTests(TestCase):
                           (90, datetime.datetime.strptime('1130', "%H%M")),
                           (180, datetime.datetime.strptime('1400', "%H%M"))
                           ))
+
+    def test_get_performances_to_be_performed(self):
+        self.localities = baker.make_recipe('performances.tests.locality', 4)
+        self.institutions = baker.make_recipe('performances.tests.institution', 6)
+        pprint(get_performances_to_be_performed())
 
     def test_performances_scheduled_per_session(self):
         self.assertEqual(
@@ -78,7 +88,7 @@ class PerformanceSchedulingTests(TestCase):
 
     def test_total_time_taken_by_all_classes(self):
         self.assertEqual(
-            total_time_taken_by_all_classes(classes=self.all_classes),
+            total_time_taken_by_all_event_performances(classes=self.all_classes),
             125)
 
     def test_divide_classes_among_theaters(self):
