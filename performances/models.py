@@ -119,8 +119,7 @@ class Event(models.Model):
         ('REGION', 'Region'),
         ('NATION', 'Nation'),
     )
-    venue = models.CharField(max_length=50)
-    locality = models.ForeignKey(Locality, on_delete=models.DO_NOTHING, null=True)
+    venue = models.ForeignKey(Institution, on_delete=models.CASCADE)
     start_date = models.DateField()
     event_level = models.CharField(
         choices=EVENT_LEVELS,
