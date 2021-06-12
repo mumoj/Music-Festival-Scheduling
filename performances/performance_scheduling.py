@@ -9,7 +9,7 @@
 """
 
 import datetime
-from pprint import pprint
+
 from typing import Union, List
 
 from django.db.models import QuerySet
@@ -33,22 +33,50 @@ def get_event(event):
 
 # OPTIMIZE: Possible repetition
 def generate_time_table(theaters_assigned_performances_per_day: dict):
+    """
+    Parameter
+    ----------
+    theaters_assigned_performances_per_day: dict
+        A dictionary of theaters as keys and their scheduled performances.
+
+    Returns
+    -------
+    tt: dict
+        The final time table with each performance having a tuple of its start and end times.
+    """
     tt: dict = {}
     for theater, days in theaters_assigned_performances_per_day.items():
         all_days_dict: dict = {}
         for day, sessions in days.items():
             all_sessions_dict: dict = {}
             for session, performances in sessions.items():
-                performance_periods_dicts: list = append_performance_start_and_end_time(
+                performance_periods_dicts = append_performance_start_and_end_time(
                     session_start=session, performances=performances)
                 all_sessions_dict.update({session: performance_periods_dicts})
             all_days_dict.update({day: all_sessions_dict})
         tt.update({theater: all_days_dict})
-        pprint(tt)
     return tt
 
 
-def append_performance_start_and_end_time(session_start, performances: Union[QuerySet, List[Performance]]):
+def append_performance_start_and_end_time(
+        session_start, performances: Union[QuerySet, List[Performance]]) -> list:
+    """
+
+    Parameters
+    ----------
+    session_start: datetime
+        When a session starts.
+    performances:
+        Performances allocated to that sessions.
+
+    Returns
+    -------
+        performance_periods_dicts: list
+            A list of dicts of performances and their appended start and end times.
+            [{<Performance: Ngojera Recital - Joy Academy >: (datetime.datetime(1900, 1, 1, 14, 0),
+                                                  datetime.datetime(1900, 1, 1, 14, 20))}]
+
+    """
     start_time = session_start
     performance_periods_dicts: list = []
     for performance in performances:
@@ -67,22 +95,23 @@ def schedule_performances_for_each_theater() -> dict:
         theaters_assigned_performances: dict
              A dict with the distribution of performances among theaters and festival sessions
             For example:
-                <Theater: Mandela's Hall>: {1: {datetime.datetime(1900, 1, 1, 8, 0):[
-                                                       <Performance: Performance object (48512)>,
-                                                       <Performance: Performance object (48511)>,
-                                                       <Performance: Performance object (48510)>,
-                                                       <Performance: Performance object (48509)>,
-                                                       <Performance: Performance object (48518)>,
-                                                       <Performance: Performance object (48517)>,
-                                                       <Performance: Performance object (48516)>,
-                                                       <Performance: Performance object (48515)>,
-                                                       <Performance: Performance object (48514)>],
-                                 datetime.datetime(1900, 1, 1, 11, 30): [],
-                                 datetime.datetime(1900, 1, 1, 14, 0): []}}}
+            <Theater: Mandela's Hall>: {1: {datetime.datetime(1900, 1, 1, 8, 0):[
+                                                   <Performance: Performance object (48512)>,
+                                                   <Performance: Performance object (48511)>,
+                                                   <Performance: Performance object (48510)>,
+                                                   <Performance: Performance object (48509)>,
+                                                   <Performance: Performance object (48518)>,
+                                                   <Performance: Performance object (48517)>,
+                                                   <Performance: Performance object (48516)>,
+                                                   <Performance: Performance object (48515)>,
+                                                   <Performance: Performance object (48514)>],
+                             datetime.datetime(1900, 1, 1, 11, 30): [],
+                             datetime.datetime(1900, 1, 1, 14, 0): []}}}
 
     """
 
-    total_time_taken = total_time_taken_by_all_event_performances(event_performances=get_performances_to_be_performed())
+    total_time_taken = total_time_taken_by_all_event_performances(
+        event_performances=get_performances_to_be_performed())
     theaters = __event__.theater_set.all()
 
     theaters_assigned_performances: dict = divide_classes_among_theaters(
@@ -269,13 +298,16 @@ def divide_classes_among_theaters(
                     continue
             time_taken = performance_class.performance_duration * no_of_performances
 
-            if time_to_theater < average_time_per_theater:
+            if time_to_theater + time_taken <= average_time_per_theater:
                 time_to_theater += time_taken
                 performance_classes_per_theater[theater].append(performance_class)
                 remaining_classes[i] = None  # Remove a class once it is allocated to a theater.
             else:
-                if time_to_theater >= average_time_per_theater:
-                    break
+                if time_to_theater+time_taken > average_time_per_theater:
+                    if len(performance_classes_per_theater[theater]) == 0:
+                        performance_classes_per_theater[theater].append(performance_class)
+                    else:
+                        break
     return performance_classes_per_theater
 
 
@@ -352,7 +384,6 @@ def get_performances_to_be_performed():
 
     event_institutions = Institution.objects.filter(locality__in=event_localities)
     event_performances = Performance.objects.filter(institution__in=event_institutions)
-
     return event_performances
 
 
