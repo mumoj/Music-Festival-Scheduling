@@ -1,30 +1,25 @@
-from pprint import pprint
+import tempfile
 
 import pdfkit
-from django.utils import timezone
-from weasyprint import HTML, CSS
 
-from django_pdfkit import PDFView
+from django.contrib import messages
 
-import tempfile
+from django.http import FileResponse
+from django.shortcuts import render
+from django.template.loader import get_template
 
 from rest_framework import generics
 from rest_framework.permissions import (
     SAFE_METHODS,
-    DjangoModelPermissions,
     BasePermission,
     IsAuthenticated)
 
-from django.shortcuts import render
-from django.contrib import messages
-from django.http import HttpResponse, FileResponse
-from django.template.loader import render_to_string, get_template
-
-from .models import Institution
 from .models import Event
-from .models import Class
-from .performance_scheduling import schedule_performances_for_each_theater, generate_time_table
+from .models import Institution
+from .performance_scheduling import get_event, schedule_performances_for_each_theater, generate_time_table
 from .serializers import InstitutionSerializer
+
+WKHTMLTOPDF_PATH: str = '/usr/local/bin/wkhtmltopdf'
 
 
 class IsOwnerOrReadOnly(BasePermission):
@@ -49,38 +44,14 @@ class RegisterInstitutions(generics.RetrieveUpdateAPIView):
     lookup_url_kwarg = 'institution_pk'
 
 
-def test_schedule_performances(request, event):
+def schedule_performances(request, festival_event):
     list(messages.get_messages(request))  # Clear messages.
+    event = Event.objects.get(pk=festival_event)
 
     try:
-        performances_for_each_theater: dict = schedule_performances_for_each_theater(
-            event=Event.objects.get(venue=event),
-            all_classes=Class.objects.all())
+        get_event(event=event)
+        performances_for_each_theater: dict = schedule_performances_for_each_theater()
         time_table = generate_time_table(performances_for_each_theater)
-
-        ctx = {
-            'time_table': time_table
-        }
-
-        return render(request, 'time_table.html', ctx)
-
-    except ZeroDivisionError:
-        messages.add_message(request, messages.ERROR, 'No theaters registered to the event!')
-        return render(request, 'time_table.html')
-
-
-WKHTMLTOPDF_PATH: str = '/usr/local/bin/wkhtmltopdf'
-
-
-def schedule_performances(request, event):
-    list(messages.get_messages(request))  # Clear messages.
-
-    try:
-        event = Event.objects.get(venue=event)
-        performances_for_each_theater: dict = schedule_performances_for_each_theater(
-            event=event,
-            all_classes=Class.objects.all())
-        time_table: dict = generate_time_table(performances_for_each_theater)
 
         event_level: str = event.event_level.lower()
         ctx = {
