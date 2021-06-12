@@ -18,21 +18,29 @@ from performances.performance_scheduling import (
 
 class PerformanceSchedulingTests(TestCase):
     def setUp(self) -> None:
-        self.all_classes = baker.make_recipe('performances.tests.performance_class', 5)
+        self.localities = baker.make_recipe('performances.tests.locality', 4)
+        self.institutions = baker.make_recipe('performances.tests.institution', 5)
+        self.all_classes = baker.make_recipe('performances.tests.p_class', 5)
         self.event = baker.make_recipe('performances.tests.event')
         get_event(event=self.event)
 
         for p_class in self.all_classes:
-            performances = baker.make(
-                'performances.Performance',
-                performance_class=p_class,
-                _quantity=5)
-            p_class.performance_set.set(performances)
+            a = baker.make_recipe('performances.tests.performance')
+            b = baker.make_recipe('performances.tests.performance')
+            c = baker.make_recipe('performances.tests.performance')
+            d = baker.make_recipe('performances.tests.performance')
+            e = baker.make_recipe('performances.tests.performance')
+
+            p_class.performance_set.set([a, b, c, d, e])
 
         self.performance_class = baker.make('performances.Class', performance_duration=5)
+        self.institution = baker.make_recipe('performances.tests.institution')
         self.class_performances = baker.make(
             'performances.Performance',
-            performance_class=self.performance_class, _quantity=5)
+            performance_class=self.performance_class,
+            institution=self.institution,
+            _quantity=5
+        )
 
         self.unscheduled_performances = []
         self.session_performances = []
@@ -48,64 +56,86 @@ class PerformanceSchedulingTests(TestCase):
         )
 
     def test_sessions_in_a_day(self):
-        self.assertEqual(sessions_in_a_day(),
-                         ((180, datetime.datetime.strptime('0800', "%H%M")),
-                          (90, datetime.datetime.strptime('1130', "%H%M")),
-                          (180, datetime.datetime.strptime('1400', "%H%M"))
-                          ))
+        self.assertEqual(
+            sessions_in_a_day(),
+            ((180, datetime.datetime.strptime('0800', "%H%M")),
+             (90, datetime.datetime.strptime('1130', "%H%M")),
+             (180, datetime.datetime.strptime('1400', "%H%M")))
+        )
 
     def test_get_performances_to_be_performed(self):
-        self.localities = baker.make_recipe('performances.tests.locality', 4)
-        self.institutions = baker.make_recipe('performances.tests.institution', 6)
-        pprint(get_performances_to_be_performed())
+        self.assertEqual(len(list(get_performances_to_be_performed())), 25)
 
     def test_performances_scheduled_per_session(self):
+        self.event_performances = get_performances_to_be_performed()
         self.assertEqual(
             len(class_performances_scheduling(
                 class_performances=self.class_performances, session_time=20,
                 balance_performances=[],
-                scheduled_performances=[])[0]),
+                scheduled_performances=[],
+                event_performances=self.event_performances)[0]),
             4,
-            msg="Scheduled performances should be 4")
+            msg="Scheduled performances should be 4"
+        )
 
     def test_class_performances_left_over_after_a_session(self):
+        self.event_performances = get_performances_to_be_performed()
         self.assertEqual(
             len(class_performances_scheduling(
                 class_performances=self.class_performances, session_time=20,
                 balance_performances=[],
-                scheduled_performances=[])[1]),
+                scheduled_performances=[],
+                event_performances=self.event_performances)[1]),
             1,
-            msg="Unscheduled performances should be 1")
+            msg="Unscheduled performances should be 1"
+        )
 
     def test_session_time_balance_after_performances_are_scheduled(self):
+        self.event_performances = get_performances_to_be_performed()
         self.assertEqual(
             class_performances_scheduling(
                 class_performances=self.class_performances, session_time=180,
                 balance_performances=[],
-                scheduled_performances=[])[2],
+                scheduled_performances=[],
+                event_performances=self.event_performances)[2],
             155,
-            msg="Session time should be 155")
+            msg="Session time should be 155"
+        )
+
+    def test_non_event_performances_are_discounted(self):
+        self.event_performances = get_performances_to_be_performed()
+        self.ins = baker.make('performances.Institution')
+        self.class_performances = self.class_performances = baker.make(
+            'performances.Performance',
+            performance_class=self.performance_class,
+            institution=self.ins,
+            _quantity=5
+        )
+
+        self.assertEqual(
+            class_performances_scheduling(
+                class_performances=self.class_performances, session_time=180,
+                balance_performances=[],
+                scheduled_performances=[],
+                event_performances=self.event_performances)[2],
+            180,
+            msg="Session time should be 180, unused"
+        )
 
     def test_total_time_taken_by_all_classes(self):
+        self.event_performances = get_performances_to_be_performed()
         self.assertEqual(
-            total_time_taken_by_all_event_performances(classes=self.all_classes),
-            125)
+            total_time_taken_by_all_event_performances(event_performances=self.event_performances),
+            150
+        )
 
     def test_divide_classes_among_theaters(self):
         theaters = baker.make_recipe('performances.tests.theater', _quantity=3)
-        self.total_classes = baker.make_recipe('performances.tests.performance_class', 5)
-
-        for p_class in self.total_classes:
-            performances = baker.make(
-                'performances.Performance',
-                performance_class=p_class,
-                _quantity=5)
-            p_class.performance_set.set(performances)
 
         self.classes_among_theaters = divide_classes_among_theaters(
             total_time_taken=125,
             theaters=theaters,
-            classes=self.total_classes)
+            classes=self.all_classes)
 
         self.average_time_to_theater = 25
         for key, value in self.classes_among_theaters.items():
@@ -140,29 +170,7 @@ class PerformanceSchedulingTests(TestCase):
                          )
 
     def test_schedule_performances_for_each_theater(self):
-        self.event = baker.make_recipe('performances.tests.event')
-        if self.event:
-            self.theaters = baker.make_recipe(
-                'performances.tests.theater', _quantity=3, venue=self.event)
-
-        self.total_classes = baker.make_recipe('performances.tests.performance_class', 3)
-        for p_class in self.total_classes:
-            performances = baker.make(
-                'performances.Performance',
-                performance_class=p_class,
-                _quantity=5)
-            p_class.performance_set.set(performances)
-
-        self.assertEqual(len(schedule_performances_for_each_theater(
-            event=self.event,
-            all_classes=self.total_classes)[self.event.theater_set.get(name='Chapel')]
-                             [1][datetime.datetime(1900, 1, 1, 8, 0)]),
-                         5)
-
-        self.theaters = schedule_performances_for_each_theater(
-            event=self.event,
-            all_classes=self.total_classes)
-        pprint(generate_time_table(theaters_assigned_performances_per_day=self.theaters))
+        pass
 
     def test_append_performance_start_and_end_time(self):
 
