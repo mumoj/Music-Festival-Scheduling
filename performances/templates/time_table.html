@@ -3,16 +3,12 @@
 {% block title %} Event Timetable {% endblock %}
 {% block style %}
     <style>
-        .keep-together {
-            page-break-inside: avoid;
+        .break-before{
+            page-break-after:always;
         }
 
-        .break-before {
-            page-break-before: always;
-        }
-
-        .break-after {
-            page-break-after: always;
+        .break-after{
+            page-break-after: always !important;
         }
 
         body {
@@ -21,12 +17,10 @@
             position: absolute;
             width: 100%;
         }
-
-        h1{
+        h1 {
             font-family: Monoton, Cursive, cursive;
         }
-
-        h1,h2, h4 {
+        h1,h2,h3, h4 {
             padding-bottom: 0.2em;
             text-align: center;
         }
@@ -34,11 +28,26 @@
             text-transform:capitalize;
             text-decoration: underline;
         }
-
-        .table-warning{
-            background-color: rgba(187, 208, 91, 0.91);
+        p {
+            text-decoration: none;
         }
-        .table-bordered{
+
+        .day{
+            width: 1000px;
+            padding: 0.5em;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+        }
+        table{
+            margin-bottom: 10%;
+        }
+        th{
+            text-align: center;
+        }
+
+        .table-bordered {
             border-collapse: collapse;
             border-style: hidden;
             border-radius: 0.8em;
@@ -48,30 +57,14 @@
             vertical-align: middle;
             border: 1px solid rgba(128, 127, 104, 0.93);
         }
-        th{
-            text-align: center;
-        }
-        .session-heading{
-            width: 10px;
-            vertical-align: middle;
-            color: rgba(128, 127, 104, 0.93);
-        }
-        .sub-table {
-            border-style: hidden;
-            border-radius: 0.8em;
-        }
-        .sub-table td{
-            border-left: none;
-            border-right: 1px solid;
-            border-top:none;
-            border-bottom:none;
-            color: black;
-            text-align: left;
-            width: 35%;
-        }
+
         .performance-period{
             width: 20%;
             text-align: center;
+        }
+        .avoid {
+            page-break-inside: avoid !important;
+            margin: 6px 0 6px 0;  /* to keep the page break from cutting too close to the text in the div */
         }
     </style>
 {% endblock %}
@@ -88,34 +81,41 @@
     {% if time_table %}
         <h1>The Kenya Music Festival </h1>
         <h2> Venue : {{ event.venue }}
-            <p><small> {{event_level  }} Levels </small></p>
+            <p><small> {{event_level  }} Levels Time Table </small></p>
+            <small><p>Date : {{event.start_date  }} </p>  </small>
         </h2>
         {% for theater, days in time_table.items %}
-            <div class="keep-together break-after break-before theater pb-5 pt-2">
-                    <table class="keep-together break-after break table table-bordered table-warning py-2"> {% for day, sessions in days.items %}
-                        <thead>
-                            <tr><th style="border-color:rgba(128, 127, 104, 0.93)" colspan="2" scope="colgroup"><h4>Theater:{{theater}} | Day:{{ day }}</h4> </th> </tr>
-                        </thead>
-                        <tbody>
-                            {% for session,performances in sessions.items %}
-                                <tr>
-                                    <th class="session-heading align-middle" scope="rowgroup"> {{ session|date:" h:i a" }} Session.</th>
-                                    <td>
-                                        <table class="sub-table table table-striped"> {% for performance in performances %}
-                                            <tr>{% for p, period in performance.items  %}
-                                                <th scope="row" class="performance-period">{{ period.0|date:" h:i a" }} - {{ period.1|date:" h:i a" }} </th>
-                                                <td>{{p}}</td>
-                                            {% endfor %}
-                                            </tr>
-                                        {% endfor %}
-                                        </table>
 
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    {% endfor %}
-                    </table>
+            <div class="theater break-before break-after pb-5 pt-2"><h3 class="text-muted"> Theater: {{ theater }}</h3>
+
+                {% for day, sessions in days.items %}
+                    <div class="day">
+                        {% for session,performances in sessions.items %}
+                            {% if performances|length > 0 %}
+                                <table class="table table-bordered table-warning table-striped pb-5 pt-2">
+                                    <tr>
+                                        <td colspan="2"><h4 class="text-center text-muted">{{ theater }} ---------- Day {{ day }} --------- {{ session| date:" h:i a" }} Session</h4> </td>
+                                    </tr>
+                                    {% for performance in performances %}
+                                        <tr>{% for p, period in performance.items  %}
+                                            <th scope="row" class="performance-period">
+                                                {{ period.0|date:" h:i a" }} - {{ period.1|date:" h:i a" }}
+                                            </th>
+                                            <td class="text-center">
+                                                <div class="avoid">
+                                                    {{p}}
+                                                </div>
+                                            </td>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </table>
+                            {% endif %}
+
+                        {% endfor %}
+                    </div>
+
+                {% endfor %}
+
             </div>
         {% endfor  %}
     {% endif %}
