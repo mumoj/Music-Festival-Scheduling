@@ -29,6 +29,7 @@ class Institution(models.Model):
         ('COLLAGE', 'Collage'),
         ('OTHERS', 'Others'))
 
+    locality = models.ForeignKey(Locality, on_delete=models.DO_NOTHING, null=True)
     name = models.CharField(max_length=100, blank=False)
     head_of_institution = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -37,7 +38,6 @@ class Institution(models.Model):
     institution_type = models.CharField(
         choices=CHOICES,
         max_length=50)
-    locality = models.ForeignKey(Locality, on_delete=models.DO_NOTHING, null=True)
 
     def __str__(self):
         return self.name
@@ -76,34 +76,37 @@ class Performance(models.Model):
     GROUP_SIZES = None
 
     performer_name = models.CharField(max_length=50, null=True, blank=True)
-    performance_type = models.CharField(
-        choices=PERFORMANCE_TYPES,
-        max_length=15)
-    performance_class = models.ForeignKey(Class, on_delete=models.CASCADE)
-    group_leader = models.ForeignKey(
-        help_text="The group leader can be a teacher in charge of a dependent performance "
-                  "or an independent performer leading  an independent performance.",
-        to=settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='performance_group_leader')
-    members = models.ManyToManyField(
-        to=settings.AUTH_USER_MODEL,
-        related_name='performance_group_members')
-    group_size = models.CharField(
-        choices=GROUP_SIZES,
-        max_length=10)
-    sponsor = models.ForeignKey(
-        to=settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='performance_sponsor',
-        null=True)
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
+    performance_class = models.ForeignKey(Class, on_delete=models.CASCADE)
 
     zonal_marks = models.IntegerField(null=True, blank=True)
     sub_county_marks = models.IntegerField(null=True, blank=True)
     county_marks = models.IntegerField(null=True, blank=True)
     regional_marks = models.IntegerField(null=True, blank=True)
     national_marks = models.IntegerField(null=True, blank=True)
+
+    group_leader = models.ForeignKey(
+        help_text="The group leader can be a teacher in charge of a dependent performance "
+                  "or an independent performer leading  an independent performance.",
+        related_name='performance_group_leader',
+        to=settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        )
+    sponsor = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='performance_sponsor',
+        null=True)
+    members = models.ManyToManyField(
+        to=settings.AUTH_USER_MODEL,
+        related_name='performance_group_members')
+    performance_type = models.CharField(
+        choices=PERFORMANCE_TYPES,
+        max_length=15)
+
+    group_size = models.CharField(
+        choices=GROUP_SIZES,
+        max_length=10)
 
     def __str__(self):
         performance_name = '%s - %s ' % (self.performance_class, self.institution)
