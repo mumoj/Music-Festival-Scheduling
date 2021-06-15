@@ -54,11 +54,14 @@ INSTALLED_APPS = [
 
     'naomi',
 
+    'corsheaders'
+
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -192,3 +195,7 @@ REST_AUTH_SERIALIZERS = {
 
 EMAIL_BACKEND = "naomi.mail.backends.naomi.NaomiBackend"
 EMAIL_FILE_PATH = "/home/jack/PycharmProjects/email_test/tmp"
+
+CORS_ORIGIN_WHITELIST = (
+    'localhost:8080',
+)
