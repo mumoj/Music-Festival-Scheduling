@@ -197,5 +197,5 @@ EMAIL_BACKEND = "naomi.mail.backends.naomi.NaomiBackend"
 EMAIL_FILE_PATH = "/home/jack/PycharmProjects/email_test/tmp"
 
 CORS_ORIGIN_WHITELIST = (
-    'localhost:8080',
+    'https://localhost:8080',
 )
