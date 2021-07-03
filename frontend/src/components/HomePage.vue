@@ -1,22 +1,18 @@
 <template>
   <div class="container">
-    <h1>{{ msg }}</h1>
+    <h1> The Kenya Music Festival </h1>
+    <login></login>
+    
   </div>
 </template>
 
 <script>
-export default {
-  name: 'HomePage',
-  props: {
-    msg: String
+  import Login from './auth/Login.vue'
+
+  export default {
+    name:'HomePage',
+    components: {
+      'Login': Login
+    }
   }
-}
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 10px 0 0;
-}
-
-</style>
