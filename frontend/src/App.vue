@@ -1,14 +1,18 @@
 <template>
-  <home-page msg="The Kenya Music Festival"/>
+  <div class="container-fluid">
+    <home-page></home-page>
+  </div>
 </template>
 
 <script>
 import HomePage from './components/HomePage.vue'
+import store from './store/index'
 
 export default {
   name: 'App',
+  store,
   components: {
-    HomePage
+    'homePage': HomePage,
   }
 }
 </script>
