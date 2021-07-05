@@ -41,7 +41,7 @@
           password: this.password
         })
       }
-    }
+    },
   }
 </script>
 
@@ -92,4 +92,5 @@
     }
   }
 </style>
+
 

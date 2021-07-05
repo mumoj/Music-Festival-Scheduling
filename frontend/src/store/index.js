@@ -1,6 +1,9 @@
+import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 
+Vue.use(Vuex)
+Vue.use(axios)
 
 export default new Vuex.Store ({
   state: {
@@ -20,10 +23,11 @@ export default new Vuex.Store ({
     doLogin({ commit }, loginData) {
       commit('loginStart');
 
-      axios.post('https://reqres.in/api/login', {
+      axios.post('http://127.0.0.1:8000/accounts/login/', {
         ...loginData
       })
-      .then(() => {
+      .then((response) => {
+        console.log(response)
         commit('loginStop', null)
       })
       .catch(error => {

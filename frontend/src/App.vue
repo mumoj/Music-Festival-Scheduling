@@ -1,18 +1,17 @@
 <template>
-  <div class="container-fluid">
-    <home-page></home-page>
+  <div id="app">
+    <img alt="Vue logo" src="./assets/logo.png">
+    <home-page/>
   </div>
 </template>
 
 <script>
 import HomePage from './components/HomePage.vue'
-import store from './store/index'
 
 export default {
   name: 'App',
-  store,
   components: {
-    'homePage': HomePage,
+    HomePage
   }
 }
 </script>
