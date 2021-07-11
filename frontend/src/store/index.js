@@ -1,15 +1,15 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import accounts from './modules/accounts'
+import auth from './modules/accounts/auth'
 
 
 Vue.use(Vuex)
 
 
 export default new Vuex.Store ({
+    namespaced: true,
     modules : {
-        accounts,
-
+        auth,
     }
 })
