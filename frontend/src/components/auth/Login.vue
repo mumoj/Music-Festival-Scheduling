@@ -1,12 +1,12 @@
 <template>
     <div class="login">
-        <div v-if="loggingIn" class="container-loading">
+        <div v-if="authenticating" class="container-loading">
             <img src="/loading.gif" alt="Loading Icon">
         </div>
         <ol v-if="loginErrors">
             <li v-for="(error, index) in loginErrors" :key="index"> {{error}} </li>
         </ol>
-        <p v-if="loginSuccessful"> Login Successful </p>
+        <p v-if="isAunthenticated"> Login Successful </p>
         <form @submit.prevent="loginSubmit">
             <input type="email" placeholder="E-Mail" v-model="email">
             <input type="password" placeholder="Password" v-model="password">
@@ -16,7 +16,7 @@
 </template>
 
 <script>
-    import { mapGetters, mapActions } from 'vuex';
+    import { mapState, mapActions } from 'vuex';
 
     export default {
         name: 'Login',
@@ -27,17 +27,21 @@
             }
         },
         computed: {
-            ...mapGetters([
-                'loggingIn',
-                'loginErrors',
-                'loginSuccessful'
-            ])
+            ...mapState({
+                authenticating: 'auth/authenticating',
+                loginErrors: 'auth/loginErrors',
+            }),
+
+            isAunthenticated () {
+                return this.$store.getters['auth/isAunthenticated']
+            }
         },
         methods: {
-            ...mapActions([
-                'doLogin'
-            ]),
+            ...mapActions({
+                doLogin: 'auth/doLogin'
+            }),
             loginSubmit() {
+                console.log(this.$store)
                 this.doLogin({
                     email: this.email,
                     password: this.password
