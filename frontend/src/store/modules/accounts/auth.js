@@ -13,6 +13,8 @@ const initialState = {
 
 const getters = {
     isAuthenticated: state => !!state.token,
+    loginErrors: state=> state.loginErrors,
+    authenticating: state => state.authenticating,
 };
 
 const mutations = {
