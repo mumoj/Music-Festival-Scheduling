@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    'debug_toolbar',
+
     'accounts.apps.AccountsConfig',
     'performances.apps.PerformancesConfig',
 
@@ -67,6 +69,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -145,6 +148,11 @@ STATIC_ROOT = BASE_DIR / 'static'
 STATICFILES_DIRS = [
     BASE_DIR / 'performances' / 'performances/static'
 ]
+
+# Django Debug Toolbar
+INTERNAL_IPS = [ '127.0.0.1']
+
+DEBUG_TOOLBAR_CONFIG = { "SHOW_TOOLBAR_CALLBACK": lambda request: True }
 
 # Custom User
 AUTH_USER_MODEL = 'accounts.CustomUser'
