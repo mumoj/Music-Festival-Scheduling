@@ -192,6 +192,11 @@ REST_AUTH_SERIALIZERS = {
     'PASSWORD_RESET_SERIALIZER':
         'accounts.serializers.CustomPasswordResetSerializer',
 }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
+}
 
 # Email Backend Configuration.
 # EMAIL_USE_SSL = True
