@@ -1,102 +1,99 @@
 <template>
     <div class="login">
-        <div v-if="authenticating" class="container-loading">
-            <img src="/loading.gif" alt="Loading Icon">
-        </div>
-        <ol v-if="loginErrors">
-            <li v-for="(error, index) in loginErrors" :key="index"> {{error}} </li>
-        </ol>
-        <p v-if="isAunthenticated"> Login Successful </p>
-        <form @submit.prevent="loginSubmit">
-            <input type="email" placeholder="E-Mail" v-model="email">
-            <input type="password" placeholder="Password" v-model="password">
-            <button type="submit">Login</button>
-        </form>
-    </div>
+
+        <v-form @submit.prevent="loginSubmit">
+            <v-container>
+                <p v-if="isAunthenticated"> Login Successful </p>
+                <div v-else-if="nonFieldErrors">
+                    <div v-for="error,index in nonFieldErrors" :key="index">
+                        {{ error }}
+                    </div>
+                </div>
+                <v-row>
+                    <v-col col="6" sm="12" xs="12" md="6">
+                        <v-text-field
+                            v-model="email.value"
+                            label="@"
+                            type="email"
+                            :error-messages = "email.error"
+                            required></v-text-field>
+                    </v-col>
+                    <v-col col="6" sm="12" xs="12" md="6">
+                        <v-text-field
+                            v-model="password.value"
+                            label="Password"
+                            type="password"
+                            :error-messages = "password.error"
+                            required></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <button type="submit">Login</button>
+                </v-row>
+            </v-container>
+        </v-form>
+    </div>    
 </template>
 
 <script>
-    import { mapState, mapActions } from 'vuex';
+    import { mapGetters, mapActions } from 'vuex';
 
     export default {
         name: 'Login',
         data() {
             return {
-                email: '',
-                password: ''
+                email: {
+                    value: '',
+                    error: null
+                },
+                password: {
+                    value:'',
+                    error:null
+                },
+                nonFieldErrors: null
             }
         },
         computed: {
-            ...mapState({
+            ...mapGetters({
                 authenticating: 'auth/authenticating',
                 loginErrors: 'auth/loginErrors',
             }),
-
             isAunthenticated () {
                 return this.$store.getters['auth/isAunthenticated']
-            }
+            },
         },
         methods: {
             ...mapActions({
                 doLogin: 'auth/doLogin'
             }),
             loginSubmit() {
-                console.log(this.$store)
                 this.doLogin({
-                    email: this.email,
-                    password: this.password
+                    email: this.email.value,
+                    password: this.password.value
                 })
-            }
+            },
+            
         },
+        watch: {
+            loginErrors : {
+                handler(val){
+                    if (val.non_field_errors){
+                        this.nonFieldErrors = val.non_field_errors
+                    }else if (val.email){
+                        this.email.error = val.email
+                    }else {
+                        this.password.errors = val.password
+                    }
+                },
+                deep: true,
+            }
+        }
     }
 </script>
 
 <style scoped lang="scss">
-  .login {
-    border: 1px solid black;
-    border-radius: 5px;
-    padding: 1.5rem;
-    width: 300px;
-    margin-left: auto;
-    margin-right: auto;
-    position: relative;
-    overflow: hidden;
-    .container-loading {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: rgba(0,0,0,.3);
-      img {
-        width: 2rem;
-        height: 2rem;
-      }
-    }
-    form {
-      display: flex;
-      flex-flow: column;
-      *:not(:last-child) {
-        margin-bottom: 1rem;
-      }
-      input {
-        padding: .5rem;
-      }
-      button {
-        padding: .5rem;
-        background-color: lightgray;
-        border: 1px solid gray;
-        border-radius: 3px;
-        cursor: pointer;
-        &:hover {
-          background-color: lightslategray;
-        }
-      }
-    }
-  }
+  
+    
 </style>
 
 
